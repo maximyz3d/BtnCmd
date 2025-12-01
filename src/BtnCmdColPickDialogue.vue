@@ -75,6 +75,21 @@
                 if(this.colField == "inputIconAboveColor"){
                     this.passedObject.inputIconAboveColor = this.currColor;
                 }
+                if(this.colField == "panelDynamicBGBooleanZeroColor"){
+                    this.passedObject.panelDynamicBGBooleanZeroColor = this.currColor;
+                }
+                if(this.colField == "panelDynamicBGBooleanOneColor"){
+                    this.passedObject.panelDynamicBGBooleanOneColor = this.currColor;
+                }
+                if(this.colField == "panelDynamicBGMinColor"){
+                    this.passedObject.panelDynamicBGMinColor = this.currColor;
+                }
+                if(this.colField == "panelDynamicBGMidColor"){
+                    this.passedObject.panelDynamicBGMidColor = this.currColor;
+                }
+                if(this.colField == "panelDynamicBGMaxColor"){
+                    this.passedObject.panelDynamicBGMaxColor = this.currColor;
+                }
                 this.$emit('exit', true);
                 this.show = false;
                 return;
@@ -95,6 +110,21 @@
             }
             if(this.colField == "inputIconAboveColor"){
                 this.currColor = this.passedObject.inputIconAboveColor;
+            }
+            if(this.colField == "panelDynamicBGBooleanZeroColor"){
+                this.currColor = this.passedObject.panelDynamicBGBooleanZeroColor;
+            }
+            if(this.colField == "panelDynamicBGBooleanOneColor"){
+                this.currColor = this.passedObject.panelDynamicBGBooleanOneColor;
+            }
+            if(this.colField == "panelDynamicBGMinColor"){
+                this.currColor = this.passedObject.panelDynamicBGMinColor;
+            }
+            if(this.colField == "panelDynamicBGMidColor"){
+                this.currColor = this.passedObject.panelDynamicBGMidColor;
+            }
+            if(this.colField == "panelDynamicBGMaxColor"){
+                this.currColor = this.passedObject.panelDynamicBGMaxColor;
             }
         }
     }
