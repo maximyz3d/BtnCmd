@@ -115,6 +115,127 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Dynamic Background" v-model="passedObject.panelDynamicBGEnabled"></v-switch></span>
+                                </template>
+                                <span>Toggle dynamic background colouring for this Object Model panel</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-row dense><v-col><span style="font-weight: bold">Dynamic Mode</span></v-col></v-row>
+                        </v-col>
+                        <v-col>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-select v-bind="attrs" v-on="on" :items="dynamicBGModeItems" item-text="text" item-value="value" label="Background Mode" v-model="passedObject.panelDynamicBGMode" :disabled="!passedObject.panelDynamicBGEnabled"></v-select>
+                                </template>
+                                <span>Select Static, Boolean, or Numeric background behaviour</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.panelDynamicBGEnabled && passedObject.panelDynamicBGMode === 'Boolean'">
+                        <v-col>
+                            <v-row dense><v-col><span style="font-weight: bold">Colour for 0</span></v-col></v-row>
+                        </v-col>
+                        <v-col>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-row dense>
+                                        <v-col v-bind="attrs" v-on="on" @click="setColor('panelDynamicBGBooleanZeroColor')" :style="'background-color: ' + passedObject.panelDynamicBGBooleanZeroColor" align-self="center"><div align="center" style="cursor:pointer">Click to edit colour</div></v-col>
+                                        <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelDynamicBGBooleanZeroColor = '#00FF00'">Reset</v-btn></div></v-col>
+                                    </v-row>
+                                </template>
+                                <span>Colour when value is 0 / false</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.panelDynamicBGEnabled && passedObject.panelDynamicBGMode === 'Boolean'">
+                        <v-col>
+                            <v-row dense><v-col><span style="font-weight: bold">Colour for 1</span></v-col></v-row>
+                        </v-col>
+                        <v-col>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-row dense>
+                                        <v-col v-bind="attrs" v-on="on" @click="setColor('panelDynamicBGBooleanOneColor')" :style="'background-color: ' + passedObject.panelDynamicBGBooleanOneColor" align-self="center"><div align="center" style="cursor:pointer">Click to edit colour</div></v-col>
+                                        <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelDynamicBGBooleanOneColor = '#FF0000'">Reset</v-btn></div></v-col>
+                                    </v-row>
+                                </template>
+                                <span>Colour when value is 1 / true</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.panelDynamicBGEnabled && passedObject.panelDynamicBGMode === 'Numeric'">
+                        <v-col cols="12">
+                            <v-row dense>
+                                <v-col><span style="font-weight: bold">Numeric Thresholds</span></v-col>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.panelDynamicBGEnabled && passedObject.panelDynamicBGMode === 'Numeric'">
+                        <v-col cols="4">
+                            <v-text-field label="Min Value" type="number" v-model.number="passedObject.panelDynamicBGMinValue"></v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field label="Mid Value" type="number" v-model.number="passedObject.panelDynamicBGMidValue"></v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-text-field label="Max Value" type="number" v-model.number="passedObject.panelDynamicBGMaxValue"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.panelDynamicBGEnabled && passedObject.panelDynamicBGMode === 'Numeric'">
+                        <v-col>
+                            <v-row dense><v-col><span style="font-weight: bold">Colour at Min</span></v-col></v-row>
+                        </v-col>
+                        <v-col>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-row dense>
+                                        <v-col v-bind="attrs" v-on="on" @click="setColor('panelDynamicBGMinColor')" :style="'background-color: ' + passedObject.panelDynamicBGMinColor" align-self="center"><div align="center" style="cursor:pointer">Click to edit colour</div></v-col>
+                                        <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelDynamicBGMinColor = '#00FF00'">Reset</v-btn></div></v-col>
+                                    </v-row>
+                                </template>
+                                <span>Colour when the value is at or below the minimum threshold</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.panelDynamicBGEnabled && passedObject.panelDynamicBGMode === 'Numeric'">
+                        <v-col>
+                            <v-row dense><v-col><span style="font-weight: bold">Colour at Mid</span></v-col></v-row>
+                        </v-col>
+                        <v-col>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-row dense>
+                                        <v-col v-bind="attrs" v-on="on" @click="setColor('panelDynamicBGMidColor')" :style="'background-color: ' + passedObject.panelDynamicBGMidColor" align-self="center"><div align="center" style="cursor:pointer">Click to edit colour</div></v-col>
+                                        <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelDynamicBGMidColor = '#FFFF00'">Reset</v-btn></div></v-col>
+                                    </v-row>
+                                </template>
+                                <span>Colour when the value is near the mid threshold</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.panelDynamicBGEnabled && passedObject.panelDynamicBGMode === 'Numeric'">
+                        <v-col>
+                            <v-row dense><v-col><span style="font-weight: bold">Colour at Max</span></v-col></v-row>
+                        </v-col>
+                        <v-col>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-row dense>
+                                        <v-col v-bind="attrs" v-on="on" @click="setColor('panelDynamicBGMaxColor')" :style="'background-color: ' + passedObject.panelDynamicBGMaxColor" align-self="center"><div align="center" style="cursor:pointer">Click to edit colour</div></v-col>
+                                        <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelDynamicBGMaxColor = '#FF0000'">Reset</v-btn></div></v-col>
+                                    </v-row>
+                                </template>
+                                <span>Colour when the value is at or above the maximum threshold</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
                     <v-row >
                         <v-col>
                             <v-row dense><v-col><span style="font-weight: bold">Text Colour</span></v-col></v-row>
@@ -245,7 +366,12 @@
                 showColPicker: false,
                 colField:'',
                 tmpModelPath:'',
-                showOMSelector: false
+                showOMSelector: false,
+                dynamicBGModeItems: [
+                    {text: 'Static', value: 'Static'},
+                    {text: 'Boolean', value: 'Boolean'},
+                    {text: 'Numeric', value: 'Numeric'}
+                ]
             }
         },
         methods: {
