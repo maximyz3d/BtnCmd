@@ -43,8 +43,8 @@
         }
 
         :deep(.vertical-slider .v-slider__thumb-label) {
-                background-color: rgba(0, 0, 0, 0.12);
-                color: inherit;
+                background-color: currentColor;
+                color: white;
                 border: 1px solid currentColor;
                 border-radius: 6px;
                 min-width: 56px;
