@@ -527,7 +527,11 @@
         },
         mounted() {
             this.tmpPassedObject = JSON.parse(JSON.stringify(this.passedObject));
-            this.tmpModelPath = this.tmpPassedObject.inputVarName;            
+            this.tmpModelPath = this.tmpPassedObject.inputVarName;
+            if (this.tmpPassedObject.inputControlRange && this.tmpPassedObject.inputControlRange.length === 2) {
+                this.tmpFromItem = this.tmpPassedObject.inputControlRange[0];
+                this.tmpToItem = this.tmpPassedObject.inputControlRange[1];
+            }
         }
     }
 </script>

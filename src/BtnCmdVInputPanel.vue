@@ -4,19 +4,6 @@
                 justify-content: center;
         }
 
-        .slider-thumb {
-                background-color: rgba(0, 0, 0, 0.12);
-                color: inherit;
-                border-radius: 6px;
-                padding: 4px 8px;
-                min-width: 48px;
-                text-align: center;
-        }
-
-        .slider-thumb--bordered {
-                border: 1px solid currentColor;
-        }
-
         .vertical-slider-wrapper {
                 height: 100%;
                 display: flex;
@@ -24,11 +11,48 @@
                 align-items: center;
                 justify-content: center;
         }
+
+        .vertical-slider-card {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                height: 100%;
+        }
+
+        .vertical-slider {
+                height: 100%;
+        }
+
+        .vertical-slider .v-slider__thumb,
+        .vertical-slider .v-slider__thumb:before {
+                box-shadow: none;
+                border: none;
+                background: transparent;
+                width: 0;
+                height: 0;
+        }
+
+        .vertical-slider .v-slider__thumb-label {
+                background-color: rgba(0, 0, 0, 0.12);
+                color: inherit;
+                border: 1px solid currentColor;
+                border-radius: 6px;
+                min-width: 48px;
+                text-align: center;
+                transform: translate(-50%, -50%);
+                left: 50%;
+                top: 50%;
+        }
+
+        .vertical-slider .v-slider__thumb-label:before {
+                display: none;
+        }
 </style>
 
 <template>
-	<div>
-		<v-card :id="`gip-${passedObject.panelID}`" class="pa-1 ma-0" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
+        <div>
+                <v-card :id="`gip-${passedObject.panelID}`" :class="['pa-1 ma-0', { 'vertical-slider-card': isVerticalSlider }]" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
 			<v-row align="center" style="height: 98%; width: 98%" class="pa-0 ma-0">
 				<v-card-text class="text-center pa-0 ma-0">
                                         <v-row v-if="passedObject.inputIconAbove && !isSliderDisp && passedObject.inputType != 'boolean'" justify="center" align="center" class="d-flex pa-0 ma-0">
@@ -49,9 +73,7 @@
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
                                                                                         <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" >
                                                                                                 <template v-slot:thumb-label="{ value }">
-                                                                                                        <div class="slider-thumb slider-thumb--bordered">
-                                                                                                                {{ getSliderDisplayValue(value) }}
-                                                                                                        </div>
+                                                                                                        {{ getSliderDisplayValue(value) }}
                                                                                                 </template>
                                                                                         </v-slider>
                                                                                 </v-row>
@@ -62,9 +84,7 @@
                                                         <v-row v-else justify="center" align="center">
                                                                 <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" >
                                                                         <template v-slot:thumb-label="{ value }">
-                                                                                <div class="slider-thumb slider-thumb--bordered">
-                                                                                        {{ getSliderDisplayValue(value) }}
-                                                                                </div>
+                                                                                {{ getSliderDisplayValue(value) }}
                                                                         </template>
                                                                 </v-slider>
                                                         </v-row>
@@ -77,11 +97,9 @@
                                                                         <template v-slot:activator="{ on, attrs }">
                                                                                 <div v-bind="attrs" v-on="on" class="vertical-slider-wrapper">
                                                                                         <span :class="`text-${passedObject.panelMMTextSize}`" :style="`color: ${passedObject.panelMMPrefixColor}`">{{ passedObject.inputPrefixText }}</span>
-                                                                                        <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" class="mt-4" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
+                                                                                        <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" class="vertical-slider mt-4" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
                                                                                                 <template v-slot:thumb-label="{ value }">
-                                                                                                        <div class="slider-thumb slider-thumb--bordered">
-                                                                                                                {{ getSliderDisplayValue(value) }}
-                                                                                                        </div>
+                                                                                                        {{ getSliderDisplayValue(value) }}
                                                                                                 </template>
                                                                                         </v-slider>
                                                                                 </div>
@@ -91,11 +109,9 @@
                                                         </div>
                                                         <div v-else class="vertical-slider-wrapper">
                                                                 <span :class="`text-${passedObject.panelMMTextSize}`" :style="`color: ${passedObject.panelMMPrefixColor}`">{{ passedObject.inputPrefixText }}</span>
-                                                                <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" class="mt-4" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
+                                                                <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" class="vertical-slider mt-4" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
                                                                         <template v-slot:thumb-label="{ value }">
-                                                                                <div class="slider-thumb slider-thumb--bordered">
-                                                                                        {{ getSliderDisplayValue(value) }}
-                                                                                </div>
+                                                                                {{ getSliderDisplayValue(value) }}
                                                                         </template>
                                                                 </v-slider>
                                                         </div>
