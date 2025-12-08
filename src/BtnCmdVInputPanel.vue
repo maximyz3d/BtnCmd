@@ -20,11 +20,17 @@
                 height: 100%;
                 width: 140px !important;
                 min-width: 140px;
+                max-width: 180px;
                 margin: 0 auto;
         }
 
         .vertical-slider {
                 height: 100%;
+        }
+
+        .borderless-card {
+                border: none !important;
+                box-shadow: none !important;
         }
 
         :deep(.vertical-slider .v-slider__thumb),
@@ -41,11 +47,16 @@
                 color: inherit;
                 border: 1px solid currentColor;
                 border-radius: 6px;
-                min-width: 48px;
+                min-width: 56px;
+                padding: 4px 10px;
                 text-align: center;
-                transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%) rotate(0deg) !important;
                 left: 50%;
                 top: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
         }
 
         :deep(.vertical-slider .v-slider__thumb-label:before) {
@@ -55,7 +66,7 @@
 
 <template>
         <div>
-                <v-card :id="`gip-${passedObject.panelID}`" :class="['pa-1 ma-0', { 'vertical-slider-card': isVerticalSlider }]" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="isVerticalSlider ? null : passedObject.panelWSize" :color="passedObject.panelColor" :style="isVerticalSlider ? 'height: 100%;' : 'height: 100%; width: 100%;'">
+                <v-card :id="`gip-${passedObject.panelID}`" :class="['pa-1 ma-0', { 'vertical-slider-card': isVerticalSlider, 'borderless-card': passedObject.borderless }]" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="isVerticalSlider ? (passedObject.panelWSize || 140) : passedObject.panelWSize" :color="passedObject.panelColor" :style="isVerticalSlider ? 'height: 100%;' : 'height: 100%; width: 100%;'">
 			<v-row align="center" style="height: 98%; width: 98%" class="pa-0 ma-0">
 				<v-card-text class="text-center pa-0 ma-0">
                                         <v-row v-if="passedObject.inputIconAbove && !isSliderDisp && passedObject.inputType != 'boolean'" justify="center" align="center" class="d-flex pa-0 ma-0">

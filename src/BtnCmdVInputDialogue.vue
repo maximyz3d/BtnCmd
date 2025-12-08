@@ -102,6 +102,14 @@
                                 <span>{{!bToggleExInp ? `Open ${tmpPassedObject.inputDispType} Config` : `Close ${tmpPassedObject.inputDispType} Config` }}</span>
                         </v-tooltip>
                         </v-col>
+                        <v-col cols="1" v-if="isSliderDispType">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn v-bind="attrs" v-on="on" :disabled="bICTType" @click="bToggleExInp = !bToggleExInp"><v-icon>{{!bToggleExInp ? 'mdi-arrow-expand-down' : 'mdi-arrow-expand-up'}}</v-icon></v-btn>
+                                </template>
+                                <span>{{!bToggleExInp ? 'Open Slider Config' : 'Close Slider Config'}}</span>
+                            </v-tooltip>
+                        </v-col>
                     </v-row>
                     <div v-if="bToggleExInp">
                         <div v-if="tmpPassedObject.inputDispType == 'selection'">
