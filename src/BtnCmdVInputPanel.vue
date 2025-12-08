@@ -42,6 +42,13 @@
                 height: 0;
         }
 
+        :deep(.vertical-slider .v-slider__thumb-label-container) {
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%) rotate(0deg) !important;
+                transform-origin: center center !important;
+        }
+
         :deep(.vertical-slider .v-slider__thumb-label) {
                 background-color: currentColor;
                 color: white;
@@ -50,10 +57,8 @@
                 min-width: 56px;
                 padding: 4px 10px;
                 text-align: center;
-                transform: translate(-50%, -50%) rotate(0deg) !important;
+                transform: none !important;
                 transform-origin: center center !important;
-                left: 50%;
-                top: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
