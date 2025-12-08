@@ -44,7 +44,6 @@
 
         :deep(.vertical-slider .v-slider__thumb-label-container) {
                 left: 50%;
-                top: 50%;
                 transform: translate(-50%, -50%) rotate(0deg) !important;
                 transform-origin: center center !important;
         }
