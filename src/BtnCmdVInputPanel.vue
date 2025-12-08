@@ -51,16 +51,22 @@
                 padding: 4px 10px;
                 text-align: center;
                 transform: translate(-50%, -50%) rotate(0deg) !important;
+                transform-origin: center center !important;
                 left: 50%;
                 top: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-weight: 600;
+                writing-mode: horizontal-tb;
         }
 
         :deep(.vertical-slider .v-slider__thumb-label:before) {
                 display: none;
+        }
+
+        :deep(.vertical-slider .v-slider__thumb-label__content) {
+                transform: rotate(0deg) !important;
         }
 </style>
 
