@@ -72,6 +72,11 @@
         :deep(.vertical-slider .v-slider__thumb-label__content) {
                 transform: rotate(0deg) !important;
         }
+
+        :deep(.vertical-slider .v-slider__thumb-label__content span) {
+                transform: none !important;
+                writing-mode: horizontal-tb;
+        }
 </style>
 
 <template>
