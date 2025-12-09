@@ -4,6 +4,27 @@
                 justify-content: center;
         }
 
+        /* Custom styling for the slider thumb label on this panel only */
+        .btncmd-slider .v-slider__thumb-label {
+                /* Remove Vuetify’s diamond rotation and “flag” offset */
+                transform: translate(-50%, -50%) !important;
+                top: 50%;
+                left: 50%;
+                border-radius: 4px;
+                background-color: #e3f2fd; /* optional: light blue */
+                box-shadow: none;
+        }
+
+        /* Hide the little triangle pointer so it’s just a rectangle */
+        .btncmd-slider .v-slider__thumb-label::before {
+                display: none;
+        }
+
+        /* Make the text horizontal and easy to read */
+        .btncmd-slider .v-slider__thumb-label span {
+                transform: none !important;
+        }
+
         .vertical-slider-wrapper {
                 height: 100%;
                 display: flex;
@@ -41,42 +62,6 @@
                 width: 0;
                 height: 0;
         }
-
-        :deep(.vertical-slider .v-slider__thumb-label-container) {
-                left: 50%;
-                transform: translate(-50%, -50%) rotate(0deg) !important;
-                transform-origin: center center !important;
-        }
-
-        :deep(.vertical-slider .v-slider__thumb-label) {
-                background-color: currentColor;
-                color: white;
-                border: 1px solid currentColor;
-                border-radius: 6px;
-                min-width: 56px;
-                padding: 4px 10px;
-                text-align: center;
-                transform: none !important;
-                transform-origin: center center !important;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: 600;
-                writing-mode: horizontal-tb;
-        }
-
-        :deep(.vertical-slider .v-slider__thumb-label:before) {
-                display: none;
-        }
-
-        :deep(.vertical-slider .v-slider__thumb-label__content) {
-                transform: rotate(0deg) !important;
-        }
-
-        :deep(.vertical-slider .v-slider__thumb-label__content span) {
-                transform: none !important;
-                writing-mode: horizontal-tb;
-        }
 </style>
 
 <template>
@@ -100,9 +85,9 @@
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
-                                                                                        <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" >
+                                                                                        <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="['btncmd-slider', `text-${passedObject.panelMMTextSize}`]" align="center" justify="center" >
                                                                                                 <template v-slot:thumb-label="{ value }">
-                                                                                                        {{ getSliderDisplayValue(value) }}
+                                                                                                        {{ value }} {{ passedObject.inputSuffixText }}
                                                                                                 </template>
                                                                                         </v-slider>
                                                                                 </v-row>
@@ -111,9 +96,9 @@
                                                                 </v-tooltip>
                                                         </v-row>
                                                         <v-row v-else justify="center" align="center">
-                                                                <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" >
+                                                                <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="['btncmd-slider', `text-${passedObject.panelMMTextSize}`]" align="center" justify="center" >
                                                                         <template v-slot:thumb-label="{ value }">
-                                                                                {{ getSliderDisplayValue(value) }}
+                                                                                {{ value }} {{ passedObject.inputSuffixText }}
                                                                         </template>
                                                                 </v-slider>
                                                         </v-row>
@@ -126,9 +111,9 @@
                                                                         <template v-slot:activator="{ on, attrs }">
                                                                                 <div v-bind="attrs" v-on="on" class="vertical-slider-wrapper">
                                                                                         <span :class="`text-${passedObject.panelMMTextSize}`" :style="`color: ${passedObject.panelMMPrefixColor}`">{{ passedObject.inputPrefixText }}</span>
-                                                                                        <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" class="vertical-slider mt-4" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
+                                                                                        <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" :class="['vertical-slider', 'mt-4', 'btncmd-slider', `text-${passedObject.panelMMTextSize}`]" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
                                                                                                 <template v-slot:thumb-label="{ value }">
-                                                                                                        {{ getSliderDisplayValue(value) }}
+                                                                                                        {{ value }} {{ passedObject.inputSuffixText }}
                                                                                                 </template>
                                                                                         </v-slider>
                                                                                 </div>
@@ -138,9 +123,9 @@
                                                         </div>
                                                         <div v-else class="vertical-slider-wrapper">
                                                                 <span :class="`text-${passedObject.panelMMTextSize}`" :style="`color: ${passedObject.panelMMPrefixColor}`">{{ passedObject.inputPrefixText }}</span>
-                                                                <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" class="vertical-slider mt-4" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
+                                                                <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" :class="['vertical-slider', 'mt-4', 'btncmd-slider', `text-${passedObject.panelMMTextSize}`]" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
                                                                         <template v-slot:thumb-label="{ value }">
-                                                                                {{ getSliderDisplayValue(value) }}
+                                                                                {{ value }} {{ passedObject.inputSuffixText }}
                                                                         </template>
                                                                 </v-slider>
                                                         </div>
