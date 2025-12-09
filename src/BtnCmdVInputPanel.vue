@@ -5,7 +5,7 @@
         }
 
         /* Custom styling for the slider thumb label on this panel only */
-        .btncmd-slider .v-slider__thumb-label {
+        :deep(.btncmd-slider .v-slider__thumb-label) {
                 /* Remove Vuetify’s diamond rotation and “flag” offset */
                 transform: translate(-50%, -50%) !important;
                 top: 50%;
@@ -16,12 +16,12 @@
         }
 
         /* Hide the little triangle pointer so it’s just a rectangle */
-        .btncmd-slider .v-slider__thumb-label::before {
+        :deep(.btncmd-slider .v-slider__thumb-label::before) {
                 display: none;
         }
 
         /* Make the text horizontal and easy to read */
-        .btncmd-slider .v-slider__thumb-label span {
+        :deep(.btncmd-slider .v-slider__thumb-label span) {
                 transform: none !important;
         }
 
