@@ -4,18 +4,25 @@
                 justify-content: center;
         }
 
-        /* Custom styling for the slider thumb label on this panel only */
-        :deep(.btncmd-slider .v-slider__thumb-label) {
-                /* Remove Vuetify’s diamond rotation and “flag” offset */
-                transform: translate(-50%, -50%) !important;
-                top: 50%;
-                left: 50%;
-                border-radius: 4px;
-                background-color: #e3f2fd; /* optional: light blue */
-                box-shadow: none;
-        }
-
-        /* Hide the little triangle pointer so it’s just a rectangle */
+        /* Hide the default circular thumb when using the vertical custom slider */
+		:deep(.vertical-slider .v-slider__thumb),
+		:deep(.vertical-slider .v-slider__thumb:before) {
+		  box-shadow: none;
+		  border: none;
+		  background: transparent;
+		}
+		
+		/* Rectangular label centered on the track */
+		:deep(.vertical-slider .v-slider__thumb-label) {
+		  transform: translate(-50%, -50%) !important;
+		  top: 50%;
+		  left: 50%;
+		  border-radius: 4px;
+		  background-color: #e3f2fd; /* pick your color */
+		  box-shadow: none;
+		}
+		
+		/* No little triangle pointer */
 		:deep(.vertical-slider .v-slider__thumb-label::before) {
 		  display: none;
 		}
@@ -33,7 +40,7 @@
                 justify-content: center;
         }
 
-        .vertical-slider-card {
+        .-card {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -45,7 +52,7 @@
                 margin: 0 auto;
         }
 
-        .vertical-slider {
+        . {
                 height: 100%;
         }
 
@@ -54,8 +61,8 @@
                 box-shadow: none !important;
         }
 
-        :deep(.vertical-slider .v-slider__thumb),
-        :deep(.vertical-slider .v-slider__thumb:before) {
+        :deep(. .v-slider__thumb),
+        :deep(. .v-slider__thumb:before) {
                 box-shadow: none;
                 border: none;
                 background: transparent;
@@ -66,7 +73,7 @@
 
 <template>
         <div>
-                <v-card :id="`gip-${passedObject.panelID}`" :class="['pa-1 ma-0', { 'vertical-slider-card': isVerticalSlider, 'borderless-card': passedObject.borderless }]" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="isVerticalSlider ? (passedObject.panelWSize || 140) : passedObject.panelWSize" :color="passedObject.panelColor" :style="isVerticalSlider ? 'height: 100%;' : 'height: 100%; width: 100%;'">
+                <v-card :id="`gip-${passedObject.panelID}`" :class="['pa-1 ma-0', { '-card': isVerticalSlider, 'borderless-card': passedObject.borderless }]" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="isVerticalSlider ? (passedObject.panelWSize || 140) : passedObject.panelWSize" :color="passedObject.panelColor" :style="isVerticalSlider ? 'height: 100%;' : 'height: 100%; width: 100%;'">
 			<v-row align="center" style="height: 98%; width: 98%" class="pa-0 ma-0">
 				<v-card-text class="text-center pa-0 ma-0">
                                         <v-row v-if="passedObject.inputIconAbove && !isSliderDisp && passedObject.inputType != 'boolean'" justify="center" align="center" class="d-flex pa-0 ma-0">
