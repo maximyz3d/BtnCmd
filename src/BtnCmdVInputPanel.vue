@@ -4,7 +4,7 @@
                 justify-content: center;
         }
 
-        /* Hide the default circular thumb when using the vertical custom slider */
+        /* Hide the default circular thumb for the custom vertical slider */
 		:deep(.vertical-slider .v-slider__thumb),
 		:deep(.vertical-slider .v-slider__thumb:before) {
 		  box-shadow: none;
@@ -12,24 +12,33 @@
 		  background: transparent;
 		}
 		
-		/* Rectangular label centered on the track */
+		/* Make the label a centered rectangle on the track */
 		:deep(.vertical-slider .v-slider__thumb-label) {
-		  transform: translate(-50%, -50%) !important;
 		  top: 50%;
 		  left: 50%;
+		  transform: translate(-50%, -50%) !important;
 		  border-radius: 4px;
-		  background-color: #e3f2fd; /* pick your color */
+		  background-color: #2196f3;  /* or your color */
 		  box-shadow: none;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  padding: 4px 8px;
 		}
 		
-		/* No little triangle pointer */
+		/* Remove the little triangle pointer */
 		:deep(.vertical-slider .v-slider__thumb-label::before) {
 		  display: none;
 		}
 		
-		/* Make the text horizontal and easy to read */
-		:deep(.vertical-slider .v-slider__thumb-label span) {
+		/* Un-rotate any text/content inside the label */
+		:deep(.vertical-slider .v-slider__thumb-label span),
+		:deep(.vertical-slider .v-slider__thumb-label__content),
+		:deep(.vertical-slider .v-slider__thumb-label > *) {
 		  transform: none !important;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
 		}
 
         .vertical-slider-wrapper {
