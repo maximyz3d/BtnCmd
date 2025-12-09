@@ -16,14 +16,14 @@
         }
 
         /* Hide the little triangle pointer so it’s just a rectangle */
-        :deep(.btncmd-slider .v-slider__thumb-label::before) {
-                display: none;
-        }
-
-        /* Make the text horizontal and easy to read */
-        :deep(.btncmd-slider .v-slider__thumb-label span) {
-                transform: none !important;
-        }
+		:deep(.vertical-slider .v-slider__thumb-label::before) {
+		  display: none;
+		}
+		
+		/* Make the text horizontal and easy to read */
+		:deep(.vertical-slider .v-slider__thumb-label span) {
+		  transform: none !important;
+		}
 
         .vertical-slider-wrapper {
                 height: 100%;
