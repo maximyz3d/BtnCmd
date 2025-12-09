@@ -14,16 +14,20 @@
 		
 		/* Make the label a centered rectangle on the track */
 		:deep(.vertical-slider .v-slider__thumb-label) {
-		  top: 50%;
-		  left: 50%;
-		  transform: translate(-50%, -50%) !important;
-		  border-radius: 4px;
-		  background-color: #2196f3;  /* or your color */
-		  box-shadow: none;
-		  display: flex;
-		  align-items: center;
-		  justify-content: center;
-		  padding: 4px 8px;
+  		top: 50%;
+  		left: 50%;
+  		transform: translate(-50%, -50%) !important;
+  		border-radius: 4px;
+  		background-color: #2196f3;  /* or your color */
+ 		 box-shadow: none;
+
+  		/* NEW: let the box grow with the text */
+  		display: flex;
+  		align-items: center;
+ 		justify-content: center;
+ 		padding: 4px 10px;       /* a bit more horizontal padding */
+  		min-width: 60px;         /* enough for "100 %" etc. */
+  		height: auto;
 		}
 		
 		/* Remove the little triangle pointer */
@@ -39,6 +43,8 @@
 		  display: flex;
 		  align-items: center;
 		  justify-content: center;
+		  white-space: nowrap;
+		  line-height: 1.2;
 		}
 
         .vertical-slider-wrapper {
@@ -82,7 +88,7 @@
 
 <template>
         <div>
-                <v-card :id="`gip-${passedObject.panelID}`" :class="['pa-1 ma-0', { '-card': isVerticalSlider, 'borderless-card': passedObject.borderless }]" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="isVerticalSlider ? (passedObject.panelWSize || 140) : passedObject.panelWSize" :color="passedObject.panelColor" :style="isVerticalSlider ? 'height: 100%;' : 'height: 100%; width: 100%;'">
+                <v-card :id="`gip-${passedObject.panelID}`" :class="['pa-1 ma-0', { '-card': isVerticalSlider, 'borderless-card': passedObject.borderless }]" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="isVerticalSlider ? (passedObject.panelWSize || 140) : passedObject.panelWSize" :color="passedObject.panelColor" :style="isVerticalSlider ? 'height: 100%; max-width: 80px; margin: 0 auto;' : 'height: 100%; width: 100%;'">
 			<v-row align="center" style="height: 98%; width: 98%" class="pa-0 ma-0">
 				<v-card-text class="text-center pa-0 ma-0">
                                         <v-row v-if="passedObject.inputIconAbove && !isSliderDisp && passedObject.inputType != 'boolean'" justify="center" align="center" class="d-flex pa-0 ma-0">
