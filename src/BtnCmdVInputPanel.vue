@@ -107,7 +107,7 @@
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
-                                                                                        <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="['btncmd-slider', `text-${passedObject.panelMMTextSize}`]" align="center" justify="center" >
+                                                                                        <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" @change="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="['btncmd-slider', `text-${passedObject.panelMMTextSize}`]" align="center" justify="center" >
                                                                                                 <template v-slot:thumb-label="{ value }">
                                                                                                         {{ value }} {{ passedObject.inputSuffixText }}
                                                                                                 </template>
@@ -118,7 +118,7 @@
                                                                 </v-tooltip>
                                                         </v-row>
                                                         <v-row v-else justify="center" align="center">
-                                                                <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="['btncmd-slider', `text-${passedObject.panelMMTextSize}`]" align="center" justify="center" >
+                                                                <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" @change="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="['btncmd-slider', `text-${passedObject.panelMMTextSize}`]" align="center" justify="center" >
                                                                         <template v-slot:thumb-label="{ value }">
                                                                                 {{ value }} {{ passedObject.inputSuffixText }}
                                                                         </template>
@@ -133,7 +133,7 @@
                                                                         <template v-slot:activator="{ on, attrs }">
                                                                                 <div v-bind="attrs" v-on="on" class="vertical-slider-wrapper">
                                                                                         <span :class="`text-${passedObject.panelMMTextSize}`" :style="`color: ${passedObject.panelMMPrefixColor}`">{{ passedObject.inputPrefixText }}</span>
-                                                                                        <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" :class="['vertical-slider', 'mt-4', 'btncmd-slider', `text-${passedObject.panelMMTextSize}`]" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
+                                                                                        <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" :class="['vertical-slider', 'mt-4', 'btncmd-slider', `text-${passedObject.panelMMTextSize}`]" @start="setPauseUpdate()" @end="setVarVal($event)" @change="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
                                                                                                 <template v-slot:thumb-label="{ value }">
                                                                                                         {{ value }} {{ passedObject.inputSuffixText }}
                                                                                                 </template>
@@ -145,7 +145,7 @@
                                                         </div>
                                                         <div v-else class="vertical-slider-wrapper">
                                                                 <span :class="`text-${passedObject.panelMMTextSize}`" :style="`color: ${passedObject.panelMMPrefixColor}`">{{ passedObject.inputPrefixText }}</span>
-                                                                <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" :class="['vertical-slider', 'mt-4', 'btncmd-slider', `text-${passedObject.panelMMTextSize}`]" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
+                                                                <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" :class="['vertical-slider', 'mt-4', 'btncmd-slider', `text-${passedObject.panelMMTextSize}`]" @start="setPauseUpdate()" @end="setVarVal($event)" @change="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
                                                                         <template v-slot:thumb-label="{ value }">
                                                                                 {{ value }} {{ passedObject.inputSuffixText }}
                                                                         </template>
