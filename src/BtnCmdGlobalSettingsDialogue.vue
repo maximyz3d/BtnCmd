@@ -29,6 +29,26 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Keyboard Control" v-model="passedObject.enableKeyboardControl"></v-switch></span>
+                                </template>
+                                <span>When enabled, configured keys can trigger BtnCmd buttons.</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-slider class="mt-4" min="10" max="600" step="5" v-model="passedObject.jogFeedrateIPM" :label="`Jog Feedrate (IPM): ${passedObject.jogFeedrateIPM}`" thumb-label></v-slider>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-text-field type="number" class="custom-label-color" label="Jog Segment Length (inches)" v-model.number="passedObject.jogSegmentInches" step="0.01"></v-text-field>
+                        </v-col>
+                    </v-row>
                     <v-row dense v-if="showToggButt">
                         <v-col cols="12">
                             <v-tooltip bottom>

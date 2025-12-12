@@ -28,20 +28,23 @@ export default {
 					MQTTServer: '',
 					MQTTPort: 1883,
 					MQTTClientID: 'BtnCmd',
-					enableSelects: true,
-					lastBackupFileName: 'BtnCmdSettings',
-					pluginMinimumHeight: 0,
-					enableGC_SH_Btn: false,
-					defaultGC_Hidden: false,
-					enableSBCC: false,
-					enableAutoBackup: false,
-					ABackupFileName: '',
-					enableLaunchAtLoad: false,
-					enableChangeTopBar: false,
-					TopBarColor: '',
-					enableBounceAtLoad: false,
-					bounceAtLoadDelay: 1
-				},
+                                        enableSelects: true,
+                                        lastBackupFileName: 'BtnCmdSettings',
+                                        pluginMinimumHeight: 0,
+                                        enableGC_SH_Btn: false,
+                                        defaultGC_Hidden: false,
+                                        enableKeyboardControl: false,
+                                        enableSBCC: false,
+                                        enableAutoBackup: false,
+                                        ABackupFileName: '',
+                                        enableLaunchAtLoad: false,
+                                        enableChangeTopBar: false,
+                                        TopBarColor: '',
+                                        enableBounceAtLoad: false,
+                                        bounceAtLoadDelay: 1,
+                                        jogFeedrateIPM: 120,
+                                        jogSegmentInches: 0.1
+                                },
 				SBCCSettings: {					
 					HTTP_Port: "8091",
 					API_KEY: 1234567890234,
@@ -69,12 +72,14 @@ export default {
 						btnHttpContType: 'text',
 						btnZIndex: 1,
 						btnWinHSize: 100,
-						btnWinWSize: 200,
-						btnReqConf: false,
-						btnConfText: 'Are You Sure?',
-						btnSBCCShowResult: false
-					}
-				],
+                                                btnWinWSize: 200,
+                                                btnReqConf: false,
+                                                btnConfText: 'Are You Sure?',
+                                                btnSBCCShowResult: false,
+                                                btnJogAxis: 'X',
+                                                btnJogDir: '+'
+                                        }
+                                ],
 				tabs: [
 					{
 						tabID: 1,
