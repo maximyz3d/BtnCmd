@@ -308,10 +308,11 @@ export default {
                         if(this.passedObject.inputDispType !== 'selection'){
                                 return [];
                         }
+                        const vals = Array.isArray(this.tempInputControlVals) ? this.tempInputControlVals : [];
                         if(this.passedObject.inputType === 'number'){
-                                return this.tempInputControlVals.map(value => ({ value, text: this.formatWithSuffix(value) }));
+                                return vals.map(value => ({ value, text: this.formatWithSuffix(value) }));
                         }
-                        return this.tempInputControlVals.map(value => ({ value, text: `${value}` }));
+                        return vals.map(value => ({ value, text: `${value}` }));
                 },
                 sliderTypes(){
                         return ['slider', 'slider-vertical'];
@@ -387,7 +388,7 @@ export default {
         },
         methods: {
                 formatWithSuffix(value){
-                        const suffix = (this.passedObject.inputSuffix || '').trim();
+                        const suffix = ((this.passedObject.inputSuffix || this.passedObject.inputSuffixText) || '').trim();
                         return suffix ? `${value} ${suffix}` : `${value}`;
                 },
                 getSliderDisplayValue(value){
