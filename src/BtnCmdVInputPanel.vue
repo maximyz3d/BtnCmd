@@ -67,17 +67,14 @@
                 margin: 0 auto;
         }
 
-        . {
-                height: 100%;
-        }
 
         .borderless-card {
                 border: none !important;
                 box-shadow: none !important;
         }
 
-        :deep(. .v-slider__thumb),
-        :deep(. .v-slider__thumb:before) {
+        :deep(.btncmd-slider .v-slider__thumb),
+        :deep(.btncmd-slider .v-slider__thumb:before) {
                 box-shadow: none;
                 border: none;
                 background: transparent;
@@ -499,15 +496,19 @@ export default {
                                 }else{
                                         //let tmpValue = newValue.target.value;
                                         let tmpValue = newValue;
-                                        if(!tmpValue){
+                                        if(tmpValue === '' || tmpValue === null || tmpValue === undefined){
                                                 tmpParent.$makeNotification('error', 'Invalid Number Entered!', 'The value of the variable has not been changed');
-						return;
-					}else{
-						tmpCmd = `set global.${this.passedObject.inputVarName} = ${Number(tmpValue)}`;
-					}
-					tmpParent.code = tmpCmd;
-					await tmpParent.send();
-					this.passedObject.inputLastVal = Number(tmpValue);
+                                                return;
+                                        }
+                                        const numericValue = Number(tmpValue);
+                                        if(Number.isNaN(numericValue)){
+                                                tmpParent.$makeNotification('error', 'Invalid Number Entered!', 'The value of the variable has not been changed');
+                                                return;
+                                        }
+                                        tmpCmd = `set global.${this.passedObject.inputVarName} = ${numericValue}`;
+                                        tmpParent.code = tmpCmd;
+                                        await tmpParent.send();
+                                        this.passedObject.inputLastVal = numericValue;
 				}
 			}
 			if(this.passedObject.inputAfterChangeGCodeCMD){
@@ -579,13 +580,18 @@ export default {
                 parseListValue(value){
                         if(this.passedObject.inputType === 'number'){
                                 const numericValue = Number(value);
-                                return Number.isNaN(numericValue) ? value : numericValue;
+                                return Number.isNaN(numericValue) ? null : numericValue;
                         }
                         return value;
                 },
                 normalizeListValues(listValues){
                         if(!Array.isArray(listValues)){
                                 return [];
+                        }
+                        if(this.passedObject.inputType === 'number'){
+                                return listValues
+                                        .map(value => this.parseListValue(value))
+                                        .filter(value => value !== null);
                         }
                         return listValues.map(value => this.parseListValue(value));
                 },

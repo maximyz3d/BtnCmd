@@ -471,7 +471,7 @@
                 }  
             },
             setRangeVals(){
-                this.tmpPassedObject.inputControlRange = [this.tmpFromItem, this.tmpToItem];
+                this.tmpPassedObject.inputControlRange = [Number(this.tmpFromItem), Number(this.tmpToItem)];
             },
             clearConfig(){
                 //clear selected fields when user changes key values
