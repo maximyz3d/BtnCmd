@@ -164,6 +164,9 @@
                             <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'selection'">
                                 <v-text-field :label="getSuffixLabel()" v-model="tmpPassedObject.inputSuffixText"></v-text-field>
                             </v-col>
+                            <v-col cols="6" v-if="tmpPassedObject.inputType === 'number' && tmpPassedObject.inputDispType === 'selection'">
+                                <v-text-field label="Suffix / Units (optional)" placeholder="% (or PSI, in, etc.)" v-model="tmpPassedObject.inputSuffix"></v-text-field>
+                            </v-col>
                             <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'slider' && tmpPassedObject.inputDispType == 'selection' && tmpPassedObject.inputUseFileForList">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
@@ -423,7 +426,7 @@
                 ],
                 radioVarTypeItems: [
                     {text: 'String', value: 'text', disabled: false, inputDispType: [{text: 'selection', value: 'selection'},{text: 'input', value: 'input'}]},
-                    {text: 'Number', value: 'number', disabled: false, inputDispType: [{text: 'input', value: 'input'}, {text:'Horizontal Slider', value:'slider'}, {text:'Vertical Slider', value:'slider-vertical'}]},
+                    {text: 'Number', value: 'number', disabled: false, inputDispType: [{text: 'selection', value: 'selection'}, {text: 'input', value: 'input'}, {text:'Horizontal Slider', value:'slider'}, {text:'Vertical Slider', value:'slider-vertical'}]},
                     {text: 'Boolean', value: 'boolean', disabled: false, inputDispType: [{text: 'switch', value: 'switch'}]}
                 ],
                 alertReqVal: false,
@@ -471,7 +474,7 @@
                 }  
             },
             setRangeVals(){
-                this.tmpPassedObject.inputControlRange = [this.tmpFromItem, this.tmpToItem];
+                this.tmpPassedObject.inputControlRange = [Number(this.tmpFromItem), Number(this.tmpToItem)];
             },
             clearConfig(){
                 //clear selected fields when user changes key values
@@ -497,8 +500,9 @@
             },
             addListItem(){
                 if(this.tmpListItem){
-                    this.tmpPassedObject.inputControlVals.push(this.tmpListItem);
-                    this.tmpListItem = null;                    
+                    const newItem = this.tmpPassedObject.inputType === 'number' ? Number(this.tmpListItem) : this.tmpListItem;
+                    this.tmpPassedObject.inputControlVals.push(newItem);
+                    this.tmpListItem = null;
                     this.$nextTick(() => {
                         try{
                             let elem = document.getElementById(`listcontent${this.tmpPassedObject.inputControlVals.length - 1}`);
@@ -536,6 +540,9 @@
         mounted() {
             this.tmpPassedObject = JSON.parse(JSON.stringify(this.passedObject));
             this.tmpModelPath = this.tmpPassedObject.inputVarName;
+            if(this.tmpPassedObject.inputSuffix === undefined){
+                this.tmpPassedObject.inputSuffix = '';
+            }
             if (this.tmpPassedObject.inputControlRange && this.tmpPassedObject.inputControlRange.length === 2) {
                 this.tmpFromItem = this.tmpPassedObject.inputControlRange[0];
                 this.tmpToItem = this.tmpPassedObject.inputControlRange[1];
