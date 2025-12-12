@@ -156,14 +156,14 @@
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
-											<v-select :items="tempInputControlVals" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
+                                                                                        <v-select :items="selectionItems" item-text="text" item-value="value" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
 										</v-row>
 									</template>
 									<span >{{ passedObject.panelHoverText }}</span>
 								</v-tooltip>
 							</v-row>
 							<v-row v-else justify="center" align="center">
-								<v-select :items="tempInputControlVals" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
+                                                            <v-select :items="selectionItems" item-text="text" item-value="value" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
 							</v-row>
 						</v-col>
 					</v-row>
@@ -304,6 +304,15 @@ export default {
                 wInpType(){return this.passedObject.inputType},
                 wInpDType(){return this.passedObject.inputDispType},
                 darkTheme(){ return store.state.settings.darkTheme; },
+                selectionItems(){
+                        if(this.passedObject.inputDispType !== 'selection'){
+                                return [];
+                        }
+                        if(this.passedObject.inputType === 'number'){
+                                return this.tempInputControlVals.map(value => ({ value, text: this.formatWithSuffix(value) }));
+                        }
+                        return this.tempInputControlVals.map(value => ({ value, text: `${value}` }));
+                },
                 sliderTypes(){
                         return ['slider', 'slider-vertical'];
                 },
@@ -366,17 +375,21 @@ export default {
 		BtnCmdBtnActionFunctions,
 		BtnCmdDataFunctions
 	],
-	data: function () {
+        data: function () {
             return {
-				showItems: false,
-				code: '',
-				newValTemp: null,
-				bPauseUpdates: false,
-				tempInputControlVals: [],
-				directory: Path.filaments
-			}
-	},
+                                showItems: false,
+                                code: '',
+                                newValTemp: null,
+                                bPauseUpdates: false,
+                                tempInputControlVals: [],
+                                directory: Path.filaments
+                        }
+        },
         methods: {
+                formatWithSuffix(value){
+                        const suffix = (this.passedObject.inputSuffix || '').trim();
+                        return suffix ? `${value} ${suffix}` : `${value}`;
+                },
                 getSliderDisplayValue(value){
                         const suffix = this.passedObject.inputSuffixText ? ` ${this.passedObject.inputSuffixText}` : '';
                         return `${value}${suffix}`;

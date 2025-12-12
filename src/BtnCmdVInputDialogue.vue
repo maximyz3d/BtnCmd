@@ -164,6 +164,9 @@
                             <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'selection'">
                                 <v-text-field :label="getSuffixLabel()" v-model="tmpPassedObject.inputSuffixText"></v-text-field>
                             </v-col>
+                            <v-col cols="6" v-if="tmpPassedObject.inputType === 'number' && tmpPassedObject.inputDispType === 'selection'">
+                                <v-text-field label="Suffix / Units (optional)" placeholder="% (or PSI, in, etc.)" v-model="tmpPassedObject.inputSuffix"></v-text-field>
+                            </v-col>
                             <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'slider' && tmpPassedObject.inputDispType == 'selection' && tmpPassedObject.inputUseFileForList">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
@@ -537,6 +540,9 @@
         mounted() {
             this.tmpPassedObject = JSON.parse(JSON.stringify(this.passedObject));
             this.tmpModelPath = this.tmpPassedObject.inputVarName;
+            if(this.tmpPassedObject.inputSuffix === undefined){
+                this.tmpPassedObject.inputSuffix = '';
+            }
             if (this.tmpPassedObject.inputControlRange && this.tmpPassedObject.inputControlRange.length === 2) {
                 this.tmpFromItem = this.tmpPassedObject.inputControlRange[0];
                 this.tmpToItem = this.tmpPassedObject.inputControlRange[1];
