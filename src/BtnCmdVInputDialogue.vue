@@ -423,7 +423,7 @@
                 ],
                 radioVarTypeItems: [
                     {text: 'String', value: 'text', disabled: false, inputDispType: [{text: 'selection', value: 'selection'},{text: 'input', value: 'input'}]},
-                    {text: 'Number', value: 'number', disabled: false, inputDispType: [{text: 'input', value: 'input'}, {text:'Horizontal Slider', value:'slider'}, {text:'Vertical Slider', value:'slider-vertical'}]},
+                    {text: 'Number', value: 'number', disabled: false, inputDispType: [{text: 'selection', value: 'selection'}, {text: 'input', value: 'input'}, {text:'Horizontal Slider', value:'slider'}, {text:'Vertical Slider', value:'slider-vertical'}]},
                     {text: 'Boolean', value: 'boolean', disabled: false, inputDispType: [{text: 'switch', value: 'switch'}]}
                 ],
                 alertReqVal: false,
@@ -497,8 +497,9 @@
             },
             addListItem(){
                 if(this.tmpListItem){
-                    this.tmpPassedObject.inputControlVals.push(this.tmpListItem);
-                    this.tmpListItem = null;                    
+                    const newItem = this.tmpPassedObject.inputType === 'number' ? Number(this.tmpListItem) : this.tmpListItem;
+                    this.tmpPassedObject.inputControlVals.push(newItem);
+                    this.tmpListItem = null;
                     this.$nextTick(() => {
                         try{
                             let elem = document.getElementById(`listcontent${this.tmpPassedObject.inputControlVals.length - 1}`);

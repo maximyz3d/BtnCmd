@@ -476,18 +476,31 @@ export default {
                                         tmpCmd = `set global.${this.passedObject.inputVarName} = ${Number(this.passedObject.inputLastVal)}`;
                                         tmpParent.code = tmpCmd;
                                         await tmpParent.send();
-				}else if(this.passedObject.inputType == "text" && this.passedObject.inputDispType == 'selection'){
-					if(newValue){
-						tmpCmd = `set global.${this.passedObject.inputVarName} = "${newValue}"`;
-						this.passedObject.inputLastVal = newValue;
-						tmpParent.code = tmpCmd;
-						await tmpParent.send();
-					}
-				}else{
-					//let tmpValue = newValue.target.value;
-					let tmpValue = newValue;
-					if(!tmpValue){
-						tmpParent.$makeNotification('error', 'Invalid Number Entered!', 'The value of the variable has not been changed');
+                                }else if(this.passedObject.inputType == "text" && this.passedObject.inputDispType == 'selection'){
+                                        if(newValue){
+                                                tmpCmd = `set global.${this.passedObject.inputVarName} = "${newValue}"`;
+                                                this.passedObject.inputLastVal = newValue;
+                                                tmpParent.code = tmpCmd;
+                                                await tmpParent.send();
+                                        }
+                                }else if(this.passedObject.inputType == "number" && this.passedObject.inputDispType == 'selection'){
+                                        if(newValue !== undefined && newValue !== null && newValue !== ""){
+                                                const numericValue = Number(newValue);
+                                                if(Number.isNaN(numericValue)){
+                                                        tmpParent.$makeNotification('error', 'Invalid Number Selected!', 'The value of the variable has not been changed');
+                                                        this.unPauseUpdate();
+                                                        return;
+                                                }
+                                                tmpCmd = `set global.${this.passedObject.inputVarName} = ${numericValue}`;
+                                                this.passedObject.inputLastVal = numericValue;
+                                                tmpParent.code = tmpCmd;
+                                                await tmpParent.send();
+                                        }
+                                }else{
+                                        //let tmpValue = newValue.target.value;
+                                        let tmpValue = newValue;
+                                        if(!tmpValue){
+                                                tmpParent.$makeNotification('error', 'Invalid Number Entered!', 'The value of the variable has not been changed');
 						return;
 					}else{
 						tmpCmd = `set global.${this.passedObject.inputVarName} = ${Number(tmpValue)}`;
@@ -542,9 +555,9 @@ export default {
 			}
 			this.bPauseUpdates = false;
 		},
-		doRightALign(){
-			//dirty hack to align text inputs 
-			if(this.passedObject.inputType != 'boolean' && this.passedObject.inputDispType == 'input'){
+                doRightALign(){
+                        //dirty hack to align text inputs
+                        if(this.passedObject.inputType != 'boolean' && this.passedObject.inputDispType == 'input'){
 				const currCard = document.getElementById(`gip-${this.passedObject.panelID}`)
 				if(currCard){
 					const inputs = currCard.getElementsByTagName('input');
@@ -560,30 +573,42 @@ export default {
 							//do nothng
 						}
 					}
-				}
-			}
-		},
-		async doListValues(){
-			if(this.passedObject.inputUseFileForList){
-				const tmpList = await this.loadSelectListFromFile(this.passedObject.inputListFilePath);
-				console.log("tmpList", tmpList);
-				this.tempInputControlVals = tmpList.listValues;
-			} else if(this.passedObject.inputListFromDB){
-				console.log("directory", this.directory);
-				const files = await store.dispatch("machine/getFileList", this.directory);
-				console.log("files", files);
-				if(files){
-					for (var i = 0; i < files.length; i++) {
-						this.tempInputControlVals.push(files[i].name);
-					}
-				}else{
-					this.tempInputControlVals = [];
-				}
-			} else{
-				console.log("gettin data from cookie");
-				this.tempInputControlVals = this.passedObject.inputControlVals;			
-			}
-		}
+                                }
+                        }
+                },
+                parseListValue(value){
+                        if(this.passedObject.inputType === 'number'){
+                                const numericValue = Number(value);
+                                return Number.isNaN(numericValue) ? value : numericValue;
+                        }
+                        return value;
+                },
+                normalizeListValues(listValues){
+                        if(!Array.isArray(listValues)){
+                                return [];
+                        }
+                        return listValues.map(value => this.parseListValue(value));
+                },
+                async doListValues(){
+                        this.tempInputControlVals = [];
+                        if(this.passedObject.inputUseFileForList){
+                                const tmpList = await this.loadSelectListFromFile(this.passedObject.inputListFilePath);
+                                console.log("tmpList", tmpList);
+                                this.tempInputControlVals = this.normalizeListValues(tmpList.listValues);
+                        } else if(this.passedObject.inputListFromDB){
+                                console.log("directory", this.directory);
+                                const files = await store.dispatch("machine/getFileList", this.directory);
+                                console.log("files", files);
+                                if(files){
+                                        this.tempInputControlVals = this.normalizeListValues(files.map(file => file.name));
+                                }else{
+                                        this.tempInputControlVals = [];
+                                }
+                        } else{
+                                console.log("gettin data from cookie");
+                                this.tempInputControlVals = this.normalizeListValues(this.passedObject.inputControlVals);
+                        }
+                }
 		
 	},
 	mounted(){
@@ -603,17 +628,45 @@ export default {
 				this.doRightALign()
 			}
 		},
-		matchedVarVal(to){
-			if(!this.bPauseUpdates){
-				this.passedObject.inputLastVal = to;
-			}
-		},
-		wInpType(){
-			this.doRightALign()
-		},
-		wInpDType(){
-			this.doRightALign()
-		}
-	}
+                matchedVarVal(to){
+                        if(!this.bPauseUpdates){
+                                this.passedObject.inputLastVal = to;
+                        }
+                },
+                wInpType(){
+                        this.doRightALign()
+                },
+                wInpDType(){
+                        this.doRightALign()
+                },
+                'passedObject.inputControlVals': {
+                        deep: true,
+                        handler(){
+                                if(this.passedObject.inputDispType === 'selection'){
+                                        this.doListValues();
+                                }
+                        }
+                },
+                'passedObject.inputDispType'(to){
+                        if(to === 'selection'){
+                                this.doListValues();
+                        }
+                },
+                'passedObject.inputUseFileForList'(){
+                        if(this.passedObject.inputDispType === 'selection'){
+                                this.doListValues();
+                        }
+                },
+                'passedObject.inputListFromDB'(){
+                        if(this.passedObject.inputDispType === 'selection'){
+                                this.doListValues();
+                        }
+                },
+                'passedObject.inputListFilePath'(){
+                        if(this.passedObject.inputDispType === 'selection' && this.passedObject.inputUseFileForList){
+                                this.doListValues();
+                        }
+                }
+        }
 }
 </script>
