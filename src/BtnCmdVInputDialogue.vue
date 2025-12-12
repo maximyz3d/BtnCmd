@@ -102,6 +102,14 @@
                                 <span>{{!bToggleExInp ? `Open ${tmpPassedObject.inputDispType} Config` : `Close ${tmpPassedObject.inputDispType} Config` }}</span>
                         </v-tooltip>
                         </v-col>
+                        <v-col cols="1" v-if="isSliderDispType">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn v-bind="attrs" v-on="on" :disabled="bICTType" @click="bToggleExInp = !bToggleExInp"><v-icon>{{!bToggleExInp ? 'mdi-arrow-expand-down' : 'mdi-arrow-expand-up'}}</v-icon></v-btn>
+                                </template>
+                                <span>{{!bToggleExInp ? 'Open Slider Config' : 'Close Slider Config'}}</span>
+                            </v-tooltip>
+                        </v-col>
                     </v-row>
                     <div v-if="bToggleExInp">
                         <div v-if="tmpPassedObject.inputDispType == 'selection'">
@@ -132,7 +140,7 @@
                                 </v-col>
                             </v-row>
                         </div>
-                        <div v-if="tmpPassedObject.inputDispType == 'slider'">
+                        <div v-if="isSliderDispType">
                             <v-row dense align="center">
                                 <v-col cols="4" offset="1">
                                     <v-text-field :rules="[rules.number]" label="Min Value" v-model="tmpFromItem" @change="setRangeVals()"></v-text-field>
@@ -153,7 +161,7 @@
                             <v-col cols="6">
                                 <v-text-field :label="getPrefixLabel()" v-model="tmpPassedObject.inputPrefixText"></v-text-field>
                             </v-col>
-                            <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'slider' && tmpPassedObject.inputDispType != 'selection'">
+                            <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'selection'">
                                 <v-text-field :label="getSuffixLabel()" v-model="tmpPassedObject.inputSuffixText"></v-text-field>
                             </v-col>
                             <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'slider' && tmpPassedObject.inputDispType == 'selection' && tmpPassedObject.inputUseFileForList">
@@ -314,7 +322,7 @@
                                     <span>Hide the panel border</span>
                                 </v-tooltip>
                             </v-col>
-                            <v-col cols="6" v-if="tmpPassedObject.inputType !='boolean' && tmpPassedObject.inputDispType != 'slider' && tmpPassedObject.inputDispType != 'selection'">
+                            <v-col cols="6" v-if="tmpPassedObject.inputType !='boolean' && !isSliderDispType && tmpPassedObject.inputDispType != 'selection'">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
                                         <span v-bind="attrs" v-on="on"><v-switch label="Clear Button" v-model="tmpPassedObject.inputEnableClear"></v-switch></span>
@@ -377,7 +385,7 @@
                 }else{return true}
             },
             bICTType(){
-                if(this.tmpPassedObject.inputDispType == 'selection' || this.tmpPassedObject.inputDispType == 'slider'){
+                if(this.tmpPassedObject.inputDispType == 'selection' || this.isSliderDispType){
                     return false;
                 }else{return true}
             },
@@ -389,10 +397,10 @@
                 }
             },
             txtColorLabel(){
-                if(this.tmpPassedObject.inputDispType == 'slider'){return "Slider Color"}else{return "Prefix/Suffix Text Colour"}
+                if(this.isSliderDispType){return "Slider Color"}else{return "Prefix/Suffix Text Colour"}
             },
             txtColorHover(){
-                if(this.tmpPassedObject.inputDispType == 'slider'){return "Click to edit Slider Color"}else{return "Click to edit text colour"}
+                if(this.isSliderDispType){return "Click to edit Slider Color"}else{return "Click to edit text colour"}
             },
             bOMLink(){
                 if(this.tmpPassedObject.inputLinkToOM){
@@ -400,6 +408,10 @@
                 }else {
                     return false;
                 }
+            },
+            isSliderDispType(){
+                if(!this.tmpPassedObject){return false;}
+                return ['slider', 'slider-vertical'].includes(this.tmpPassedObject.inputDispType);
             }
         },
         data: function () {
@@ -411,7 +423,7 @@
                 ],
                 radioVarTypeItems: [
                     {text: 'String', value: 'text', disabled: false, inputDispType: [{text: 'selection', value: 'selection'},{text: 'input', value: 'input'}]},
-                    {text: 'Number', value: 'number', disabled: false, inputDispType: [{text: 'input', value: 'input'}, {text:'slider', value:'slider'}]},
+                    {text: 'Number', value: 'number', disabled: false, inputDispType: [{text: 'input', value: 'input'}, {text:'Horizontal Slider', value:'slider'}, {text:'Vertical Slider', value:'slider-vertical'}]},
                     {text: 'Boolean', value: 'boolean', disabled: false, inputDispType: [{text: 'switch', value: 'switch'}]}
                 ],
                 alertReqVal: false,
@@ -477,7 +489,7 @@
             getPrefixLabel(){
                 if(this.tmpPassedObject.inputType == 'boolean'){
                     return "False Label"
-                }if(this.tmpPassedObject.inputDispType == 'slider' || this.tmpPassedObject.inputDispType == 'selection'){
+                }if(this.isSliderDispType || this.tmpPassedObject.inputDispType == 'selection'){
                     return "Label"
                 }else {
                     return "Prefix Text"
@@ -523,7 +535,11 @@
         },
         mounted() {
             this.tmpPassedObject = JSON.parse(JSON.stringify(this.passedObject));
-            this.tmpModelPath = this.tmpPassedObject.inputVarName;            
+            this.tmpModelPath = this.tmpPassedObject.inputVarName;
+            if (this.tmpPassedObject.inputControlRange && this.tmpPassedObject.inputControlRange.length === 2) {
+                this.tmpFromItem = this.tmpPassedObject.inputControlRange[0];
+                this.tmpToItem = this.tmpPassedObject.inputControlRange[1];
+            }
         }
     }
 </script>

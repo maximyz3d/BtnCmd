@@ -1,24 +1,105 @@
 <style scoped>
-	.switch-center {
-		display: flex;
-		justify-content: center;
-	}
+        .switch-center {
+                display: flex;
+                justify-content: center;
+        }
+
+        /* Hide the default circular thumb for the custom vertical slider */
+		:deep(.vertical-slider .v-slider__thumb),
+		:deep(.vertical-slider .v-slider__thumb:before) {
+		  box-shadow: none;
+		  border: none;
+		  background: transparent;
+		}
+		
+		/* Make the label a centered rectangle on the track */
+		:deep(.vertical-slider .v-slider__thumb-label) {
+  		top: 50%;
+  		left: 50%;
+  		transform: translate(-50%, -50%) !important;
+  		border-radius: 4px;
+  		background-color: #2196f3;  /* or your color */
+ 		 box-shadow: none;
+
+  		/* NEW: let the box grow with the text */
+  		display: flex;
+  		align-items: center;
+ 		justify-content: center;
+ 		padding: 4px 10px;       /* a bit more horizontal padding */
+  		min-width: 60px;         /* enough for "100 %" etc. */
+  		height: auto;
+		}
+		
+		/* Remove the little triangle pointer */
+		:deep(.vertical-slider .v-slider__thumb-label::before) {
+		  display: none;
+		}
+		
+		/* Un-rotate any text/content inside the label */
+		:deep(.vertical-slider .v-slider__thumb-label span),
+		:deep(.vertical-slider .v-slider__thumb-label__content),
+		:deep(.vertical-slider .v-slider__thumb-label > *) {
+		  transform: none !important;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  white-space: nowrap;
+		  line-height: 1.2;
+		}
+
+        .vertical-slider-wrapper {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+        }
+
+        .-card {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                height: 100%;
+                width: 140px !important;
+                min-width: 140px;
+                max-width: 180px;
+                margin: 0 auto;
+        }
+
+        . {
+                height: 100%;
+        }
+
+        .borderless-card {
+                border: none !important;
+                box-shadow: none !important;
+        }
+
+        :deep(. .v-slider__thumb),
+        :deep(. .v-slider__thumb:before) {
+                box-shadow: none;
+                border: none;
+                background: transparent;
+                width: 0;
+                height: 0;
+        }
 </style>
 
 <template>
-	<div>
-		<v-card :id="`gip-${passedObject.panelID}`" class="pa-1 ma-0" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
+        <div>
+                <v-card :id="`gip-${passedObject.panelID}`" :class="['pa-1 ma-0', { '-card': isVerticalSlider, 'borderless-card': passedObject.borderless }]" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="isVerticalSlider ? (passedObject.panelWSize || 140) : passedObject.panelWSize" :color="passedObject.panelColor" :style="isVerticalSlider ? 'height: 100%; max-width: 80px; margin: 0 auto;' : 'height: 100%; width: 100%;'">
 			<v-row align="center" style="height: 98%; width: 98%" class="pa-0 ma-0">
 				<v-card-text class="text-center pa-0 ma-0">
-					<v-row v-if="passedObject.inputIconAbove && passedObject.inputDispType != 'slider' && passedObject.inputType != 'boolean'" justify="center" align="center" class="d-flex pa-0 ma-0">
-						<v-col cols="12" justify="center">
-							<v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
-						</v-col>
-					</v-row>
-					<v-row v-if="passedObject.inputType == 'number' && passedObject.inputDispType == 'slider'" dense justify="center" align="center">
-						<v-col class="d-flex flex-column pa-0 ma-0" justify="center" align="center" cols="10">
-							<v-row v-if="passedObject.inputIconAbove" justify="center" align="center" class="d-flex pa-0 ma-0 mt-n16">
-								<v-col cols="12" justify="center">
+                                        <v-row v-if="passedObject.inputIconAbove && !isSliderDisp && passedObject.inputType != 'boolean'" justify="center" align="center" class="d-flex pa-0 ma-0">
+                                                <v-col cols="12" justify="center">
+                                                        <v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
+                                                </v-col>
+                                        </v-row>
+                                        <v-row v-if="isHorizontalSlider" dense justify="center" align="center">
+                                                <v-col class="d-flex flex-column pa-0 ma-0" justify="center" align="center" cols="10">
+                                                        <v-row v-if="passedObject.inputIconAbove" justify="center" align="center" class="d-flex pa-0 ma-0 mt-n16">
+                                                                <v-col cols="12" justify="center">
 									<v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
 								</v-col>
 							</v-row>
@@ -26,17 +107,52 @@
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
-											<v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" ></v-slider>
-										</v-row>
-									</template>
-									<span >{{ passedObject.panelHoverText }}</span>
-								</v-tooltip>
-							</v-row>
-							<v-row v-else justify="center" align="center">
-								<v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" ></v-slider>
-							</v-row>
-						</v-col>
-					</v-row>
+                                                                                        <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" @change="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="['btncmd-slider', `text-${passedObject.panelMMTextSize}`]" align="center" justify="center" >
+                                                                                                <template v-slot:thumb-label="{ value }">
+                                                                                                        {{ value }} {{ passedObject.inputSuffixText }}
+                                                                                                </template>
+                                                                                        </v-slider>
+                                                                                </v-row>
+                                                                        </template>
+                                                                        <span >{{ passedObject.panelHoverText }}</span>
+                                                                </v-tooltip>
+                                                        </v-row>
+                                                        <v-row v-else justify="center" align="center">
+                                                                <v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" @change="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="['btncmd-slider', `text-${passedObject.panelMMTextSize}`]" align="center" justify="center" >
+                                                                        <template v-slot:thumb-label="{ value }">
+                                                                                {{ value }} {{ passedObject.inputSuffixText }}
+                                                                        </template>
+                                                                </v-slider>
+                                                        </v-row>
+                                                </v-col>
+                                        </v-row>
+                                        <v-row v-if="isVerticalSlider" dense justify="center" align="center" style="height: 100%;">
+                                                <v-col class="vertical-slider-wrapper pa-0 ma-0" cols="12">
+                                                        <div v-if="passedObject.panelHoverText" class="text-center">
+                                                                <v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
+                                                                        <template v-slot:activator="{ on, attrs }">
+                                                                                <div v-bind="attrs" v-on="on" class="vertical-slider-wrapper">
+                                                                                        <span :class="`text-${passedObject.panelMMTextSize}`" :style="`color: ${passedObject.panelMMPrefixColor}`">{{ passedObject.inputPrefixText }}</span>
+                                                                                        <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" :class="['vertical-slider', 'mt-4', 'btncmd-slider', `text-${passedObject.panelMMTextSize}`]" @start="setPauseUpdate()" @end="setVarVal($event)" @change="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
+                                                                                                <template v-slot:thumb-label="{ value }">
+                                                                                                        {{ value }} {{ passedObject.inputSuffixText }}
+                                                                                                </template>
+                                                                                        </v-slider>
+                                                                                </div>
+                                                                        </template>
+                                                                        <span>{{ passedObject.panelHoverText }}</span>
+                                                                </v-tooltip>
+                                                        </div>
+                                                        <div v-else class="vertical-slider-wrapper">
+                                                                <span :class="`text-${passedObject.panelMMTextSize}`" :style="`color: ${passedObject.panelMMPrefixColor}`">{{ passedObject.inputPrefixText }}</span>
+                                                                <v-slider vertical v-model="passedObject.inputLastVal" thumb-label="always" :class="['vertical-slider', 'mt-4', 'btncmd-slider', `text-${passedObject.panelMMTextSize}`]" @start="setPauseUpdate()" @end="setVarVal($event)" @change="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :color="passedObject.panelMMPrefixColor" >
+                                                                        <template v-slot:thumb-label="{ value }">
+                                                                                {{ value }} {{ passedObject.inputSuffixText }}
+                                                                        </template>
+                                                                </v-slider>
+                                                        </div>
+                                                </v-col>
+                                        </v-row>
 					<v-row v-if="passedObject.inputDispType == 'selection'" dense justify="center" align="center">
 						<v-col class="d-flex flex-column pa-0 ma-0" justify="center" align="center" cols="10">
 							<v-row v-if="passedObject.panelHoverText" justify="center" align="center">
@@ -187,13 +303,25 @@ export default {
 		matchedVarVal() {return this.getModelValue();},
 		currHSize() {return this.passedObject.panelHSize},
 		currWSize() {return this.passedObject.panelWSize},
-		currfinResize() {return this.passedObject.bPanelActivated},
-		wInpType(){return this.passedObject.inputType},
-		wInpDType(){return this.passedObject.inputDispType},
-		darkTheme(){ return store.state.settings.darkTheme; },
-		systemDirectory() {
-			return store.state.machine.model.directories.system;
-		},
+                currfinResize() {return this.passedObject.bPanelActivated},
+                wInpType(){return this.passedObject.inputType},
+                wInpDType(){return this.passedObject.inputDispType},
+                darkTheme(){ return store.state.settings.darkTheme; },
+                sliderTypes(){
+                        return ['slider', 'slider-vertical'];
+                },
+                isSliderDisp(){
+                        return this.sliderTypes.includes(this.passedObject.inputDispType);
+                },
+                isHorizontalSlider(){
+                        return this.passedObject.inputType == 'number' && this.passedObject.inputDispType == 'slider';
+                },
+                isVerticalSlider(){
+                        return this.passedObject.inputType == 'number' && this.passedObject.inputDispType == 'slider-vertical';
+                },
+                systemDirectory() {
+                        return store.state.machine.model.directories.system;
+                },
 		bHasPrefix(){
 			if(this.passedObject.inputPrefixText){
 				let tempText = this.passedObject.inputPrefixText.replace(/ /g, "");
@@ -251,10 +379,14 @@ export default {
 				directory: Path.filaments
 			}
 	},
-	methods: {
-		getModelValue(){
-			const jp = jsonpath;
-			if(this.passedObject.inputVarName && !this.passedObject.inputLinkToOM){
+        methods: {
+                getSliderDisplayValue(value){
+                        const suffix = this.passedObject.inputSuffixText ? ` ${this.passedObject.inputSuffixText}` : '';
+                        return `${value}${suffix}`;
+                },
+                getModelValue(){
+                        const jp = jsonpath;
+                        if(this.passedObject.inputVarName && !this.passedObject.inputLinkToOM){
 				let tmpNum = null;
 				let tmpArr = null;
 				//detect if this is a global variable array and retrieve the array value - dwc 3.5
@@ -340,10 +472,10 @@ export default {
 					tmpParent.code = tmpCmd;
 					await tmpParent.send();
 					
-				}else if(this.passedObject.inputType == "number" && this.passedObject.inputDispType == 'slider'){
-					tmpCmd = `set global.${this.passedObject.inputVarName} = ${Number(this.passedObject.inputLastVal)}`;
-					tmpParent.code = tmpCmd;
-					await tmpParent.send();
+                                }else if(this.passedObject.inputType == "number" && this.isSliderDisp){
+                                        tmpCmd = `set global.${this.passedObject.inputVarName} = ${Number(this.passedObject.inputLastVal)}`;
+                                        tmpParent.code = tmpCmd;
+                                        await tmpParent.send();
 				}else if(this.passedObject.inputType == "text" && this.passedObject.inputDispType == 'selection'){
 					if(newValue){
 						tmpCmd = `set global.${this.passedObject.inputVarName} = "${newValue}"`;
