@@ -13,40 +13,48 @@ export default class BtnCmdHoldJogEngine {
         this.bufferMaxIn = 0.5;
         this.inFlight = 0;
         this.maxInFlight = 1;
+        this.controlSource = null;
     }
 
-    startHold(btn, globalSettings, sendCodeFn, getAxisPosInchesFn) {
-        if (!btn || !btn.btnID || this.btnAxisMap.has(btn.btnID)) {
-            return;
+    startHold(btn, globalSettings, sendCodeFn, getAxisPosInchesFn, source = 'unknown') {
+        if (!btn || !btn.btnID) {
+            return false;
+        }
+        const sourceTag = source || 'unknown';
+        if (this.controlSource && this.controlSource !== sourceTag) {
+            return false;
+        }
+        if (this.btnAxisMap.has(btn.btnID)) {
+            return true;
         }
         const segSetting = Number(globalSettings?.jogSegmentInches);
         const feedSetting = Number(globalSettings?.jogFeedrateIPM);
         const segIn = Math.abs(segSetting) || this.defaultSegment;
         const feedIpm = Math.abs(feedSetting) || this.defaultFeedrate;
         if (!segIn || !feedIpm || !btn.btnJogAxis || !btn.btnJogDir || typeof sendCodeFn !== 'function') {
-            return;
+            return false;
         }
 
         const axisLetter = btn.btnJogAxis.toUpperCase();
         const dirSign = btn.btnJogDir === '-' ? -1 : 1;
 
         if (['Z', 'A'].includes(axisLetter) && this.activeAxes.size > 0) {
-            return;
+            return false;
         }
         const hasRestricted = Array.from(this.activeAxes.keys()).some((ax) => ['Z', 'A'].includes(ax));
         if (hasRestricted && !['Z', 'A'].includes(axisLetter)) {
-            return;
+            return false;
         }
         const nonPlanar = Array.from(this.activeAxes.keys()).some((ax) => !['X', 'Y'].includes(ax));
         if (['X', 'Y'].includes(axisLetter) && nonPlanar) {
-            return;
+            return false;
         }
         const existingAxis = this.activeAxes.get(axisLetter);
         if (existingAxis) {
             if (existingAxis.dirSign !== dirSign) {
-                return;
+                return false;
             }
-            return;
+            return true;
         }
 
         let basePos = typeof getAxisPosInchesFn === 'function' ? getAxisPosInchesFn(axisLetter) : null;
@@ -59,6 +67,9 @@ export default class BtnCmdHoldJogEngine {
         this.feedIpm = feedIpm;
         this.sendCodeFn = sendCodeFn;
         this.getAxisPosInchesFn = getAxisPosInchesFn;
+        if (!this.controlSource) {
+            this.controlSource = sourceTag;
+        }
 
         this.activeAxes.set(axisLetter, {
             btnID: btn.btnID,
@@ -71,6 +82,7 @@ export default class BtnCmdHoldJogEngine {
             this.pollTimer = setInterval(() => this.attemptRefillAll(), this.defaultPollIntervalMs);
         }
         this.attemptRefillAll();
+        return true;
     }
 
     stopHold(btnID) {
@@ -168,5 +180,6 @@ export default class BtnCmdHoldJogEngine {
             this.pollTimer = null;
         }
         this.inFlight = 0;
+        this.controlSource = null;
     }
 }

@@ -1537,11 +1537,12 @@ export default {
                                 if(this.chkJobEnabled(btn)){
                                         return;
                                 }
-                                this.$set(this.activeKeydowns, btnID, true);
-                                if(btn.btnType === 'JogHold'){
-                                        this.startHoldJog(btn);
-                                }else{
-                                        this.onBtnClick(event, btn);
+                                const started = btn.btnType === 'JogHold' ? this.startHoldJog(btn, 'keyboard') : true;
+                                if(started){
+                                        this.$set(this.activeKeydowns, btnID, true);
+                                        if(btn.btnType !== 'JogHold'){
+                                                this.onBtnClick(event, btn);
+                                        }
                                 }
                         });
                 },
@@ -1563,7 +1564,7 @@ export default {
                                 event.preventDefault();
                                 event.stopPropagation();
                         }
-                        this.startHoldJog(btn);
+                        this.startHoldJog(btn, 'pointer');
                 },
                 onJogPointerUp(event, btn){
                         if(event){
@@ -1587,19 +1588,19 @@ export default {
                         }
                         return axis.machinePosition;
                 },
-                startHoldJog(btn){
+                startHoldJog(btn, source = 'unknown'){
                         if(this.editMode || this.settingsMode){
-                                return;
+                                return false;
                         }
                         if(btn.btnType !== 'JogHold'){
-                                return;
+                                return false;
                         }
                         if(this.chkJobEnabled(btn)){
-                                return;
+                                return false;
                         }
-                        this.jogEngine.startHold(btn, this.btnCmd.globalSettings, (code) => {
+                        return this.jogEngine.startHold(btn, this.btnCmd.globalSettings, (code) => {
                                 return store.dispatch('machine/sendCode', code);
-                        }, this.getAxisPosInches);
+                        }, this.getAxisPosInches, source);
                 },
                 stopHoldJog(btnID){
                         this.jogEngine.stopHold(btnID);
