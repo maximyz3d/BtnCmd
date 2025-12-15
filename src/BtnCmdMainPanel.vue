@@ -1572,6 +1572,21 @@ export default {
                         }
                         this.stopHoldJog(btn.btnID);
                 },
+                getAxisPosInches(axisLetter){
+                        const axes = store?.state?.machine?.model?.move?.axes;
+                        if(!Array.isArray(axes)){
+                                return null;
+                        }
+                        const axis = axes.find((ax) => ax.letter && ax.letter.toUpperCase() === axisLetter.toUpperCase());
+                        if(!axis || typeof axis.machinePosition !== 'number'){
+                                return null;
+                        }
+                        const units = (axis.units || store?.state?.machine?.model?.state?.units || '').toString().toLowerCase();
+                        if(units.startsWith('mm')){
+                                return axis.machinePosition / 25.4;
+                        }
+                        return axis.machinePosition;
+                },
                 startHoldJog(btn){
                         if(this.editMode || this.settingsMode){
                                 return;
@@ -1582,12 +1597,12 @@ export default {
                         if(this.chkJobEnabled(btn)){
                                 return;
                         }
-                        this.jogEngine.start(btn, this.btnCmd.globalSettings, (code) => {
-                                store.dispatch('machine/sendCode', {code: code, fromInput: true});
-                        });
+                        this.jogEngine.startHold(btn, this.btnCmd.globalSettings, (code) => {
+                                return store.dispatch('machine/sendCode', code);
+                        }, this.getAxisPosInches);
                 },
                 stopHoldJog(btnID){
-                        this.jogEngine.stop(btnID);
+                        this.jogEngine.stopHold(btnID);
                 },
                 isJogActive(btnID){
                         return this.jogEngine.isActive(btnID);
@@ -1943,11 +1958,12 @@ export default {
                 window.removeEventListener('keydown', this.onGlobalKeyDown);
                 window.removeEventListener('keyup', this.onGlobalKeyUp);
                 Object.keys(this.activeKeydowns).forEach((btnID) => this.stopHoldJog(btnID));
+                this.jogEngine.stopAll();
         },
-	activated(){
-		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
-				this.toggleTopPanel(true);
-				this.updateForDesktop();
+        activated(){
+                if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
+                                this.toggleTopPanel(true);
+                                this.updateForDesktop();
 		}
 	},
 

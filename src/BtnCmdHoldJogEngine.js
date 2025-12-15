@@ -3,73 +3,121 @@ export default class BtnCmdHoldJogEngine {
         this.activeJogs = new Map();
         this.defaultSegment = 0.1;
         this.defaultFeedrate = 120;
+        this.defaultPollIntervalMs = 35;
     }
 
-    start(btn, globalSettings, sendCodeFn) {
+    startHold(btn, globalSettings, sendCodeFn, getAxisPosInchesFn) {
         if (!btn || !btn.btnID || this.activeJogs.has(btn.btnID)) {
             return;
         }
         const segSetting = Number(globalSettings?.jogSegmentInches);
         const feedSetting = Number(globalSettings?.jogFeedrateIPM);
-        const seg = Math.abs(segSetting) || this.defaultSegment;
-        const feed = Math.abs(feedSetting) || this.defaultFeedrate;
-        if (!seg || !feed || !btn.btnJogAxis || !btn.btnJogDir) {
+        const segIn = Math.abs(segSetting) || this.defaultSegment;
+        const feedIpm = Math.abs(feedSetting) || this.defaultFeedrate;
+        if (!segIn || !feedIpm || !btn.btnJogAxis || !btn.btnJogDir || typeof sendCodeFn !== 'function') {
             return;
         }
 
-        const distance = (btn.btnJogDir === '-') ? -Math.abs(seg) : Math.abs(seg);
-        const axis = btn.btnJogAxis.toUpperCase();
-        const command = `G20\nG91\nG1 ${axis}${distance} F${feed}\nG90`;
-        const segmentTimeMs = Math.max((Math.abs(seg) / (feed / 60)) * 1000, 10);
-        const sendOffset = segmentTimeMs * 0.8;
+        const axisLetter = btn.btnJogAxis.toUpperCase();
+        const dirSign = btn.btnJogDir === '-' ? -1 : 1;
+        let basePos = typeof getAxisPosInchesFn === 'function' ? getAxisPosInchesFn(axisLetter) : null;
+        if (basePos === undefined || basePos === null || Number.isNaN(basePos)) {
+            console.warn(`[BtnCmdHoldJogEngine] Axis position unavailable for ${axisLetter}, defaulting to 0.`);
+            basePos = 0;
+        }
+
+        const command = `G20\nG91\nG1 ${axisLetter}${dirSign * segIn} F${feedIpm}\nG90`;
+        const pollIntervalMs = this.defaultPollIntervalMs;
 
         const state = {
-            cmd: command,
-            timer: null,
-            lastSend: 0,
-            interval: segmentTimeMs,
-            sendOffset,
+            active: true,
+            btnID: btn.btnID,
+            axisLetter,
+            dirSign,
+            segIn,
+            feedIpm,
+            bufferMaxIn: 0.5,
+            sentTargetPos: basePos,
+            inFlight: 0,
+            maxInFlight: 1,
+            pollTimer: null,
             sendCodeFn,
+            getAxisPosInchesFn,
+            command,
+            pollIntervalMs,
         };
 
         this.activeJogs.set(btn.btnID, state);
-        this._sendAndSchedule(btn.btnID);
+        this.attemptRefill(btn.btnID);
+        state.pollTimer = setInterval(() => this.attemptRefill(btn.btnID), pollIntervalMs);
     }
 
-    stop(btnID) {
+    stopHold(btnID) {
         const state = this.activeJogs.get(btnID);
-        if (state?.timer) {
-            clearTimeout(state.timer);
+        if (state) {
+            state.active = false;
+            if (state.pollTimer) {
+                clearInterval(state.pollTimer);
+            }
         }
         this.activeJogs.delete(btnID);
+    }
+
+    stopAll() {
+        Array.from(this.activeJogs.keys()).forEach((btnID) => this.stopHold(btnID));
     }
 
     isActive(btnID) {
         return this.activeJogs.has(btnID);
     }
 
-    _sendAndSchedule(btnID) {
+    attemptRefill(btnID) {
         const state = this.activeJogs.get(btnID);
-        if (!state) {
+        if (!state || !state.active) {
             return;
         }
-        state.lastSend = Date.now();
-        state.sendCodeFn(state.cmd);
 
-        const scheduleNext = () => {
-            const activeState = this.activeJogs.get(btnID);
-            if (!activeState) {
+        const segTimeMs = (state.segIn / (state.feedIpm / 60)) * 1000;
+        state.bufferMaxIn = state.pollIntervalMs > segTimeMs * 0.8 ? 1.0 : 0.5;
+        state.maxInFlight = segTimeMs < state.pollIntervalMs ? 2 : 1;
+
+        const currentPos = typeof state.getAxisPosInchesFn === 'function'
+            ? state.getAxisPosInchesFn(state.axisLetter)
+            : null;
+
+        if (currentPos === undefined || currentPos === null || Number.isNaN(currentPos)) {
+            if (state.inFlight < state.maxInFlight) {
+                this.sendOneSegment(btnID);
+                state.sentTargetPos += state.dirSign * state.segIn;
+            }
+            return;
+        }
+
+        let bufferedAhead = state.dirSign * (state.sentTargetPos - currentPos);
+
+        while (bufferedAhead < state.bufferMaxIn && state.inFlight < state.maxInFlight) {
+            this.sendOneSegment(btnID);
+            state.sentTargetPos += state.dirSign * state.segIn;
+            bufferedAhead = state.dirSign * (state.sentTargetPos - currentPos);
+        }
+    }
+
+    sendOneSegment(btnID) {
+        const state = this.activeJogs.get(btnID);
+        if (!state || !state.active) {
+            return;
+        }
+
+        state.inFlight += 1;
+        Promise.resolve(state.sendCodeFn(state.command)).finally(() => {
+            const currentState = this.activeJogs.get(btnID);
+            if (!currentState) {
                 return;
             }
-            const now = Date.now();
-            const elapsed = now - activeState.lastSend;
-            let delay = activeState.sendOffset - elapsed;
-            if (elapsed > activeState.interval) {
-                delay = 0;
+            currentState.inFlight = Math.max(0, currentState.inFlight - 1);
+            if (currentState.active) {
+                this.attemptRefill(btnID);
             }
-            activeState.timer = setTimeout(() => this._sendAndSchedule(btnID), Math.max(0, delay));
-        };
-
-        scheduleNext();
+        });
     }
 }
