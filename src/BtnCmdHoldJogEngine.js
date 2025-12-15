@@ -119,9 +119,8 @@ export default class BtnCmdHoldJogEngine {
         this.maxInFlight = segTimeMs < this.defaultPollIntervalMs ? 2 : 1;
 
         const axisStates = Array.from(this.activeAxes.values());
-        const validStates = [];
         const bufferedAheadValues = [];
-        let hasValidPosition = false;
+        let validCount = 0;
 
         axisStates.forEach((axisState) => {
             const currentPos = typeof this.getAxisPosInchesFn === 'function'
@@ -131,12 +130,11 @@ export default class BtnCmdHoldJogEngine {
             if (currentPos === undefined || currentPos === null || Number.isNaN(currentPos)) {
                 return;
             }
-            hasValidPosition = true;
-            validStates.push(axisState);
+            validCount += 1;
             bufferedAheadValues.push(axisState.dirSign * (axisState.sentTargetPos - currentPos));
         });
 
-        if (!hasValidPosition) {
+        if (validCount === 0) {
             if (this.inFlight < this.maxInFlight) {
                 this.sendCombinedSegment(axisStates, segIn, feedIpm);
                 axisStates.forEach((axisState) => {
@@ -146,13 +144,17 @@ export default class BtnCmdHoldJogEngine {
             return;
         }
 
+        if (validCount !== axisStates.length) {
+            return;
+        }
+
         let minBufferedAhead = Math.min(...bufferedAheadValues);
         while (minBufferedAhead < this.bufferMaxIn && this.inFlight < this.maxInFlight) {
             this.sendCombinedSegment(axisStates, segIn, feedIpm);
             axisStates.forEach((axisState) => {
                 axisState.sentTargetPos += axisState.dirSign * segIn;
             });
-            validStates.forEach((axisState, idx) => {
+            bufferedAheadValues.forEach((_, idx) => {
                 bufferedAheadValues[idx] += segIn;
             });
             minBufferedAhead = Math.min(...bufferedAheadValues);
