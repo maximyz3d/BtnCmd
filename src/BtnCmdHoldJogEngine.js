@@ -1,14 +1,18 @@
 export default class BtnCmdHoldJogEngine {
     constructor() {
         this.activeJogs = new Map();
+        this.defaultSegment = 0.1;
+        this.defaultFeedrate = 120;
     }
 
     start(btn, globalSettings, sendCodeFn) {
         if (!btn || !btn.btnID || this.activeJogs.has(btn.btnID)) {
             return;
         }
-        const seg = Number(globalSettings?.jogSegmentInches) || 0;
-        const feed = Number(globalSettings?.jogFeedrateIPM) || 0;
+        const segSetting = Number(globalSettings?.jogSegmentInches);
+        const feedSetting = Number(globalSettings?.jogFeedrateIPM);
+        const seg = Math.abs(segSetting) || this.defaultSegment;
+        const feed = Math.abs(feedSetting) || this.defaultFeedrate;
         if (!seg || !feed || !btn.btnJogAxis || !btn.btnJogDir) {
             return;
         }
