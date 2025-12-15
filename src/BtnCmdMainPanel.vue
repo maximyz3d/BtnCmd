@@ -1444,6 +1444,22 @@ export default {
                         return this.keyBindings ? this.keyBindings[btnID] : null;
                 },
                 setBinding(btnID, binding){
+                        if(!binding){
+                                return;
+                        }
+                        // ensure a single key/code is only bound to one button
+                        Object.keys(this.keyBindings).forEach((existingBtnID) => {
+                                if(existingBtnID === btnID){
+                                        return;
+                                }
+                                const existingBinding = this.keyBindings[existingBtnID];
+                                if(!existingBinding){
+                                        return;
+                                }
+                                if(existingBinding.code === binding.code || existingBinding.key === binding.key){
+                                        this.$delete(this.keyBindings, existingBtnID);
+                                }
+                        });
                         this.$set(this.keyBindings, btnID, binding);
                         this.saveKeyBindings();
                 },
