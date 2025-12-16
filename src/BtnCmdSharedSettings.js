@@ -34,26 +34,14 @@ function ensureKeyboardFields(settings) {
 }
 
 function setGlobalSettingsRef(globalSettings) {
-    const target = sharedState.global || Vue.observable({});
     if (globalSettings) {
         ensureKeyboardFields(globalSettings);
         sharedState.sourceRef = globalSettings;
-        Object.keys(globalSettings).forEach((key) => {
-            if (!Object.prototype.hasOwnProperty.call(target, key)) {
-                Vue.set(target, key, globalSettings[key]);
-            } else {
-                target[key] = globalSettings[key];
-            }
-        });
+        sharedState.global = Vue.observable(globalSettings);
     } else {
         sharedState.sourceRef = null;
-        Object.keys(target).forEach((key) => {
-            if (Object.prototype.hasOwnProperty.call(defaultGlobals, key)) {
-                target[key] = defaultGlobals[key];
-            }
-        });
+        sharedState.global = defaultGlobals;
     }
-    sharedState.global = target;
 }
 
 function getGlobal() {
