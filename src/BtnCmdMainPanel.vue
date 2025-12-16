@@ -1576,14 +1576,22 @@ export default {
                 },
                 onJogPointerDown(event, btn){
                         if(event){
-                                event.preventDefault();
+                                const t = event.type || '';
+                                const isTouch = t.indexOf('touch') === 0;
+                                if(!isTouch){
+                                        event.preventDefault();
+                                }
                                 event.stopPropagation();
                         }
                         this.startHoldJog(btn, 'pointer');
                 },
                 onJogPointerUp(event, btn){
                         if(event){
-                                event.preventDefault();
+                                const t = event.type || '';
+                                const isTouch = t.indexOf('touch') === 0;
+                                if(!isTouch){
+                                        event.preventDefault();
+                                }
                                 event.stopPropagation();
                         }
                         this.stopHoldJog(btn.btnID);
@@ -1595,6 +1603,25 @@ export default {
                                 this.$delete(this.activeKeydowns, btnID);
                         });
                         this.activeKeydowns = {};
+                },
+                onWindowBlur(){
+                        this.stopAllHoldJogs();
+                },
+                onVisibilityChange(){
+                        if(document.hidden){
+                                this.stopAllHoldJogs();
+                        }
+                },
+                onPointerCancelGlobal(){
+                        this.stopAllHoldJogs();
+                },
+                onContextMenuGlobal(e){
+                        if(this.jogEngine && typeof this.jogEngine.hasActive === 'function' && this.jogEngine.hasActive()){
+                                if(e && typeof e.preventDefault === 'function'){
+                                        e.preventDefault();
+                                }
+                        }
+                        this.stopAllHoldJogs();
                 },
                 axisIndex(letter){
                         const map = { X: 0, Y: 1, Z: 2, A: 3 };
@@ -2001,6 +2028,10 @@ export default {
                 this.loadKeyBindings();
                 window.addEventListener('keydown', this.onGlobalKeyDown);
                 window.addEventListener('keyup', this.onGlobalKeyUp);
+                window.addEventListener('blur', this.onWindowBlur, { passive: true });
+                document.addEventListener('visibilitychange', this.onVisibilityChange, { passive: true });
+                window.addEventListener('pointercancel', this.onPointerCancelGlobal, { passive: true });
+                window.addEventListener('contextmenu', this.onContextMenuGlobal);
                 //Hide the top panel if set in global plugin settings and not on mobile device - this is needed for first load only
                 if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.mobile){
                         this.toggleTopPanel(true);
@@ -2011,6 +2042,10 @@ export default {
         beforeDestroy(){
                 window.removeEventListener('keydown', this.onGlobalKeyDown);
                 window.removeEventListener('keyup', this.onGlobalKeyUp);
+                window.removeEventListener('blur', this.onWindowBlur);
+                document.removeEventListener('visibilitychange', this.onVisibilityChange);
+                window.removeEventListener('pointercancel', this.onPointerCancelGlobal);
+                window.removeEventListener('contextmenu', this.onContextMenuGlobal);
                 Object.keys(this.activeKeydowns).forEach((btnID) => this.stopHoldJog(btnID));
                 this.jogEngine.stopAll();
         },

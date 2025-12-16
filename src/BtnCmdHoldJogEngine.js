@@ -122,6 +122,10 @@ export default class BtnCmdHoldJogEngine {
         this.cleanupTimers();
     }
 
+    hasActive() {
+        return this.activeAxes && this.activeAxes.size > 0;
+    }
+
     isActive(btnID) {
         return this.btnAxisMap.has(btnID);
     }
