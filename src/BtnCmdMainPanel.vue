@@ -1586,15 +1586,15 @@ export default {
                         if(!Array.isArray(axes)){
                                 return null;
                         }
-                        const axis = axes.find((ax) => ax.letter && ax.letter.toUpperCase() === axisLetter.toUpperCase());
+                        const letter = axisLetter ? axisLetter.toUpperCase() : '';
+                        const idxMap = { X: 0, Y: 1, Z: 2, A: 3 };
+                        const axisIdx = idxMap[letter];
+                        const axis = typeof axisIdx === 'number' ? axes[axisIdx] : axes.find((ax) => ax.letter && ax.letter.toUpperCase() === letter);
                         if(!axis || typeof axis.machinePosition !== 'number'){
                                 return null;
                         }
-                        const units = (axis.units || store?.state?.machine?.model?.state?.units || '').toString().toLowerCase();
-                        if(units.startsWith('mm')){
-                                return axis.machinePosition / 25.4;
-                        }
-                        return axis.machinePosition;
+                        const posIn = axis.machinePosition / 25.4;
+                        return Number.isFinite(posIn) ? posIn : null;
                 },
                 getAxisAccelMm(axisLetter){
                         const axes = store?.state?.machine?.model?.move?.axes;
