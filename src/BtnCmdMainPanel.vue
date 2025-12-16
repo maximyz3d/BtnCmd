@@ -1581,16 +1581,22 @@ export default {
                         }
                         this.stopHoldJog(btn.btnID);
                 },
+                axisIndex(letter){
+                        const map = { X: 0, Y: 1, Z: 2, A: 3 };
+                        const key = (letter || '').toUpperCase();
+                        return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : null;
+                },
                 getAxisPosInches(axisLetter){
                         const axes = store?.state?.machine?.model?.move?.axes;
                         if(!Array.isArray(axes)){
                                 return null;
                         }
                         const letter = axisLetter ? axisLetter.toUpperCase() : '';
-                        const idxMap = { X: 0, Y: 1, Z: 2, A: 3 };
-                        const axisIdx = idxMap[letter];
-                        const axis = typeof axisIdx === 'number' ? axes[axisIdx] : axes.find((ax) => ax.letter && ax.letter.toUpperCase() === letter);
-                        if(!axis || typeof axis.machinePosition !== 'number'){
+                        const axisIdx = this.axisIndex(letter);
+                        const axis = axisIdx !== null && typeof axisIdx === 'number'
+                                ? axes[axisIdx]
+                                : axes.find((ax) => ax.letter && ax.letter.toUpperCase() === letter);
+                        if(!axis || typeof axis.machinePosition !== 'number' || !Number.isFinite(axis.machinePosition)){
                                 return null;
                         }
                         const posIn = axis.machinePosition / 25.4;
@@ -1601,7 +1607,11 @@ export default {
                         if(!Array.isArray(axes)){
                                 return null;
                         }
-                        const axis = axes.find((ax) => ax.letter && ax.letter.toUpperCase() === axisLetter.toUpperCase());
+                        const letter = axisLetter ? axisLetter.toUpperCase() : '';
+                        const axisIdx = this.axisIndex(letter);
+                        const axis = axisIdx !== null && typeof axisIdx === 'number'
+                                ? axes[axisIdx]
+                                : axes.find((ax) => ax.letter && ax.letter.toUpperCase() === letter);
                         if(!axis){
                                 return null;
                         }

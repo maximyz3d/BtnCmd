@@ -22,6 +22,7 @@ export default class BtnCmdHoldJogEngine {
         this.maxInFlight = 1;
         this.controlSource = null;
         this.missingAccelWarned = new Set();
+        this.debugRefillCount = 0;
     }
 
     startHold(btn, globalSettings, sendCodeFn, getAxisPosInchesFn, getAxisAccelMmFn, source = 'unknown') {
@@ -141,10 +142,15 @@ export default class BtnCmdHoldJogEngine {
         const bufferedAheadValues = [];
         let validCount = 0;
         let backlogExceeded = false;
+        const logAllowed = this.debugRefillCount < 10;
+        const debugRows = [];
 
         axisStates.forEach((axisState) => {
             const currentPos = typeof this.getAxisPosInchesFn === 'function'
                 ? this.getAxisPosInchesFn(axisState.axisLetter)
+                : null;
+            const accelMm = typeof this.getAxisAccelMmFn === 'function'
+                ? this.getAxisAccelMmFn(axisState.axisLetter)
                 : null;
 
             if (currentPos === undefined || currentPos === null || Number.isNaN(currentPos)) {
@@ -155,6 +161,16 @@ export default class BtnCmdHoldJogEngine {
             const backlogDistanceIn = Math.abs(axisState.sentTargetPos - currentPos);
             if (backlogDistanceIn > 2 * segInDynamic) {
                 backlogExceeded = true;
+            }
+            if (logAllowed) {
+                debugRows.push({
+                    axisLetter: axisState.axisLetter,
+                    currentPos,
+                    sentTargetPos: axisState.sentTargetPos,
+                    segInDynamic,
+                    accelMm,
+                    backlogExceeded: false,
+                });
             }
         });
 
@@ -173,7 +189,22 @@ export default class BtnCmdHoldJogEngine {
         }
 
         if (backlogExceeded) {
+            if (logAllowed) {
+                debugRows.forEach((row) => {
+                    row.backlogExceeded = true;
+                    console.debug('[BtnCmdHoldJogEngine] refill', row);
+                });
+                this.debugRefillCount += 1;
+            }
             return;
+        }
+
+        if (logAllowed && debugRows.length > 0) {
+            debugRows.forEach((row) => {
+                row.backlogExceeded = false;
+                console.debug('[BtnCmdHoldJogEngine] refill', row);
+            });
+            this.debugRefillCount += 1;
         }
 
         let minBufferedAhead = Math.min(...bufferedAheadValues);
@@ -212,6 +243,7 @@ export default class BtnCmdHoldJogEngine {
         this.inFlight = 0;
         this.controlSource = null;
         this.missingAccelWarned.clear();
+        this.debugRefillCount = 0;
     }
 
     computeDynamicSegIn(feedIpm, axisLettersInMove, fallbackSegIn) {
