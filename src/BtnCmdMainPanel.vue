@@ -43,10 +43,13 @@
 	.handle-bl{bottom:-15px;left:-15px;cursor:sw-resize}
 	.handle-bm{bottom:-15px;left:50%;margin-left:-5px;cursor:s-resize}
 	.handle-br{bottom:-15px;right:-15px;cursor:se-resize}@media only screen and (max-width:768px){[class*=handle-]:before{content:"";left:-10px;right:-10px;bottom:-10px;top:-10px;position:absolute}}
-	.drag-handle,
-	.drag-handle:hover {cursor: move !important}
-	.drag-button,
-	.drag-button:hover {cursor: move !important}
+        .drag-handle,
+        .drag-handle:hover {cursor: move !important}
+        .drag-button,
+        .drag-button:hover {cursor: move !important}
+        .btncmd-jog-active {
+                box-shadow: inset 0 0 0 2px #ff9800;
+        }
 </style>
 <template>
     <div id="BtnCmdMainDiv">
@@ -274,7 +277,7 @@
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
-																				<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																					<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																					<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																				</v-btn>
@@ -285,7 +288,7 @@
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
-																				<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+   <v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																					<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																					<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																				</v-btn>
@@ -295,13 +298,13 @@
 																	</div>
 																	<!--Non tooltip buttons-->
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																		<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
 																	</div>
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0">
-																		<v-btn v-if="btn.autoSize" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+   <v-btn v-if="btn.autoSize" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
@@ -425,7 +428,7 @@
 						<a href="https://pictogrammers.com/library/mdi/" target="_blank">Material Design Icon Library</a><br>
 					</v-alert>
 				</v-row>
-				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSBCC="btnCmd.globalSettings.enableSBCC" :SBCCCombinedJson="tmpSBCCSet"></BtnCmdSettingsDialogue>
+                            <BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSBCC="btnCmd.globalSettings.enableSBCC" :SBCCCombinedJson="tmpSBCCSet" :keyBinding="getBinding(getPassedBtnID())" :setKeyBinding="setBinding" :clearKeyBinding="clearBinding" @capture-start="onCaptureStart" @capture-end="onCaptureEnd"></BtnCmdSettingsDialogue>
 				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]"></BtnCmdTabSettingsDialogue>
 				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :createMode="createMode" :isCNCMode="isCNCMode"></BtnCmdPanelSettingsDialogue>
 				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]"></BtnCmdAWCPanelDialogue>
@@ -785,6 +788,10 @@ import BtnCmdImportDialog from './BtnCmdImportDialog.vue';
 import BtnCmdListPanel from './BtnCmdListPanel.vue';
 import BtnCmdChart from './BtnCmdChart.vue';
 import BtnCmdChartPanelDialogue from './BtnCmdChartPanelDialogue.vue';
+import BtnCmdHoldJogEngine from './BtnCmdHoldJogEngine';
+import BtnCmdSharedSettings from './BtnCmdSharedSettings';
+
+const KEYMAP_STORAGE_KEY = 'btncmd_keymap_v1';
 
 
 
@@ -893,14 +900,17 @@ export default {
 			var tmpCmdsObj = sbbcMerge(this.tmpSBCCDef.SBCC_Cmds, this.btnCmd.SBCC_Cmds);
 			return tmpCmdsObj
 		},
-		systemDSFVer(){
-			if(this.systemDSFVerStr !== null && this.systemDSFVerStr !== ''){
-				return true;
-			}else{
-				return false;
-			}
-		}		
-	},
+                systemDSFVer(){
+                        if(this.systemDSFVerStr !== null && this.systemDSFVerStr !== ''){
+                                return true;
+                        }else{
+                                return false;
+                        }
+                },
+                keyboardJogEnabled(){
+                        return BtnCmdSharedSettings.getEnableKeyboardJog();
+                }
+        },
 	mixins: [
 		BtnCmdDataFunctions,
 		BtnCmdBtnActionFunctions,
@@ -970,10 +980,14 @@ export default {
 			reloadSBCCSet: false,
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
-			tmpSBCCDef: {},
-			lastLayoutTabID: null,
-			btnCmdVersion: '01.04.11',
-			btnCmd : {
+                        tmpSBCCDef: {},
+                        lastLayoutTabID: null,
+                        btnCmdVersion: '01.04.11',
+                        keyBindings: {},
+                        activeKeydowns: {},
+                        capturingBinding: false,
+                        jogEngine: new BtnCmdHoldJogEngine(),
+                        btnCmd : {
 				btnCmdVersion: '01.04.11',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
@@ -984,29 +998,36 @@ export default {
 					lastInputID: 1,
 					last_SBCC_Cmd_ID: 1002,
 				},
-				globalSettings: {
-					enableActionMsg: true,
-					enableMQTT: false,
-					enableEvents: false,
-					MQTTUserName: '',
-					MQTTPassword: '',
-					MQTTServer: '',
-					MQTTPort: 1883,
-					MQTTClientID: 'BtnCmd',
-					enableSelects: true,
-					lastBackupFileName: 'BtnCmdSettings',
-					pluginMinimumHeight: 0,
-					enableGC_SH_Btn: false,
-					defaultGC_Hidden: false,
-					enableSBCC: false,
-					enableAutoBackup: false,
-					ABackupFileName: '',
-					enableLaunchAtLoad: false,
-					enableChangeTopBar: false,
-					TopBarColor: '',
-					enableBounceAtLoad: false,
-					bounceAtLoadDelay: 1
-				},
+                                globalSettings: {
+                                        enableActionMsg: true,
+                                        enableMQTT: false,
+                                        enableEvents: false,
+                                        MQTTUserName: '',
+                                        MQTTPassword: '',
+                                        MQTTServer: '',
+                                        MQTTPort: 1883,
+                                        MQTTClientID: 'BtnCmd',
+                                        enableSelects: true,
+                                        lastBackupFileName: 'BtnCmdSettings',
+                                        pluginMinimumHeight: 0,
+                                        enableGC_SH_Btn: false,
+                                        defaultGC_Hidden: false,
+                                        enableKeyboardControl: false,
+                                        enableKeyboardJog: false,
+                                        enableSBCC: false,
+                                        enableAutoBackup: false,
+                                        ABackupFileName: '',
+                                        enableLaunchAtLoad: false,
+                                        enableChangeTopBar: false,
+                                        TopBarColor: '',
+                                        enableBounceAtLoad: false,
+                                        bounceAtLoadDelay: 1,
+                                        jogFeedrateIPM: 120,
+                                        jogSegmentInches: 0.1,
+                                        jogSegmentScale: 1.0,
+                                        jogMinSegmentInches: 0.1,
+                                        jogMaxSegmentInches: 6.0
+                                },
 				SBCCSettings: {					
 					HTTP_Port: "8091",
 					API_KEY: 1234567890234,
@@ -1034,12 +1055,14 @@ export default {
 						btnHttpContType: 'text',
 						btnZIndex: 1,
 						btnWinHSize: 100,
-						btnWinWSize: 200,
-						btnReqConf: false,
-						btnConfText: 'Are You Sure?',
-						btnSBCCShowResult: false
-					}
-				],
+                                                btnWinWSize: 200,
+                                                btnReqConf: false,
+                                                btnConfText: 'Are You Sure?',
+                                                btnSBCCShowResult: false,
+                                                btnJogAxis: 'X',
+                                                btnJogDir: '+'
+                                        }
+                                ],
 				tabs: [
 					{
 						tabID: 1,
@@ -1238,17 +1261,24 @@ export default {
 			this.currHideTopPanel = !this.currHideTopPanel;
 			this.toggleTopPanel(this.currHideTopPanel);
 		},
-		toggleTopPanel(bHideGCPanel){
-			if(bHideGCPanel){
-				window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
-				window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
-				window.document.getElementById("global-container").hidden = true;
-				this.currHideTopPanel = true;
-			}else {
-				window.document.getElementById("global-container").hidden = false;
-				this.currHideTopPanel = false;
-			}
-		},		
+                toggleTopPanel(bHideGCPanel){
+                        if(bHideGCPanel){
+                                window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
+                                window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
+                                window.document.getElementById("global-container").hidden = true;
+                                this.currHideTopPanel = true;
+                        }else {
+                                window.document.getElementById("global-container").hidden = false;
+                                if(this.mobileActive){
+                                        window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight;
+                                        window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight;
+                                }else{
+                                        window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70;
+                                        window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70;
+                                }
+                                this.currHideTopPanel = false;
+                        }
+                },
 		getBottomPixels() {
 			if(this.showBottomNavigation) {
 				try{
@@ -1401,18 +1431,265 @@ export default {
 			tmpPanelObj.panelZIndex = this.currTabObj.lastZIndex;
 		},
 		//plugin UI functions
-		chkJobEnabled(item){
-			if(!item.btnEnableWhileJob && this.isPrinting){
-				return true;
-			}else {
-				return false;
-			}
-		},
-		dialogDisplayed(){
-			if(this.dialog || this.showEdit || this.showTabEdit || this.showGSEdit || this.showESEdit || this.showInfo || this.showPanelEdit || this.showFileDialog){
-				return true;
-			}else {
-				return false;
+                chkJobEnabled(item){
+                        if(!item.btnEnableWhileJob && this.isPrinting){
+                                return true;
+                        }else {
+                                return false;
+                        }
+                },
+                loadKeyBindings(){
+                        try{
+                                const raw = window.localStorage.getItem(KEYMAP_STORAGE_KEY);
+                                if(raw){
+                                        this.keyBindings = JSON.parse(raw);
+                                }
+                        }catch{
+                                this.keyBindings = {};
+                        }
+                },
+                saveKeyBindings(){
+                        try{
+                                window.localStorage.setItem(KEYMAP_STORAGE_KEY, JSON.stringify(this.keyBindings));
+                        }catch{
+                                return;
+                        }
+                },
+                getBinding(btnID){
+                        return this.keyBindings ? this.keyBindings[btnID] : null;
+                },
+                setBinding(btnID, binding){
+                        if(!binding){
+                                return;
+                        }
+                        // ensure a single key/code is only bound to one button
+                        Object.keys(this.keyBindings).forEach((existingBtnID) => {
+                                if(existingBtnID === btnID){
+                                        return;
+                                }
+                                const existingBinding = this.keyBindings[existingBtnID];
+                                if(!existingBinding){
+                                        return;
+                                }
+                                if(existingBinding.code === binding.code || existingBinding.key === binding.key){
+                                        this.$delete(this.keyBindings, existingBtnID);
+                                }
+                        });
+                        this.$set(this.keyBindings, btnID, binding);
+                        this.saveKeyBindings();
+                },
+                clearBinding(btnID){
+                        this.$delete(this.keyBindings, btnID);
+                        this.saveKeyBindings();
+                },
+                getPassedBtnID(){
+                        if(Array.isArray(this.objectToPass) && this.objectToPass[0]){
+                                return this.objectToPass[0].btnID;
+                        }
+                        if(this.objectToPass && this.objectToPass.btnID){
+                                return this.objectToPass.btnID;
+                        }
+                        return null;
+                },
+                onCaptureStart(){
+                        this.capturingBinding = true;
+                },
+                onCaptureEnd(){
+                        this.capturingBinding = false;
+                },
+                shouldHandleKeyEvent(event){
+                        if(this.capturingBinding){
+                                return false;
+                        }
+                        if(!this.keyboardJogEnabled){
+                                return false;
+                        }
+                        if(this.editMode || this.settingsMode){
+                                return false;
+                        }
+                        const target = event.target;
+                        if(target){
+                                const tag = target.tagName;
+                                if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'){
+                                        return false;
+                                }
+                                if(target.isContentEditable){
+                                        return false;
+                                }
+                        }
+                        return true;
+                },
+                bindingsForKeyEvent(event){
+                        const matches = [];
+                        if(!this.keyBindings){
+                                return matches;
+                        }
+                        Object.keys(this.keyBindings).forEach((btnID) => {
+                                const binding = this.keyBindings[btnID];
+                                if(binding && (binding.code === event.code || binding.key === event.key)){
+                                        matches.push(btnID);
+                                }
+                        });
+                        return matches;
+                },
+                onGlobalKeyDown(event){
+                        if(!this.shouldHandleKeyEvent(event)){
+                                return;
+                        }
+                        const btnIDs = this.bindingsForKeyEvent(event);
+                        if(btnIDs.length > 0){
+                                event.preventDefault();
+                                event.stopPropagation();
+                        }
+                        btnIDs.forEach((btnID) => {
+                                if(this.activeKeydowns[btnID]){
+                                        return;
+                                }
+                                const btn = this.btnCmd.btns.find(item => item.btnID === btnID);
+                                if(!btn){
+                                        return;
+                                }
+                                if(this.chkJobEnabled(btn)){
+                                        return;
+                                }
+                                const started = btn.btnType === 'JogHold' ? this.startHoldJog(btn, 'keyboard') : true;
+                                if(started){
+                                        this.$set(this.activeKeydowns, btnID, true);
+                                        if(btn.btnType !== 'JogHold'){
+                                                this.onBtnClick(event, btn);
+                                        }
+                                }
+                        });
+                },
+                onGlobalKeyUp(event){
+                        if(!this.shouldHandleKeyEvent(event)){
+                                return;
+                        }
+                        const btnIDs = this.bindingsForKeyEvent(event);
+                        btnIDs.forEach((btnID) => {
+                                const btn = this.btnCmd.btns.find(item => item.btnID === btnID);
+                                if(btn && btn.btnType === 'JogHold'){
+                                        this.stopHoldJog(btn.btnID);
+                                }
+                                this.$delete(this.activeKeydowns, btnID);
+                        });
+                },
+                onJogPointerDown(event, btn){
+                        if(event){
+                                const t = event.type || '';
+                                const isTouch = t.indexOf('touch') === 0;
+                                if(!isTouch){
+                                        event.preventDefault();
+                                }
+                                event.stopPropagation();
+                        }
+                        this.startHoldJog(btn, 'pointer');
+                },
+                onJogPointerUp(event, btn){
+                        if(event){
+                                const t = event.type || '';
+                                const isTouch = t.indexOf('touch') === 0;
+                                if(!isTouch){
+                                        event.preventDefault();
+                                }
+                                event.stopPropagation();
+                        }
+                        this.stopHoldJog(btn.btnID);
+                },
+                stopAllHoldJogs(){
+                        this.jogEngine.stopAll();
+                        Object.keys(this.activeKeydowns).forEach((btnID) => {
+                                this.stopHoldJog(btnID);
+                                this.$delete(this.activeKeydowns, btnID);
+                        });
+                        this.activeKeydowns = {};
+                },
+                onWindowBlur(){
+                        this.stopAllHoldJogs();
+                },
+                onVisibilityChange(){
+                        if(document.hidden){
+                                this.stopAllHoldJogs();
+                        }
+                },
+                onPointerCancelGlobal(){
+                        this.stopAllHoldJogs();
+                },
+                onContextMenuGlobal(e){
+                        if(this.jogEngine && typeof this.jogEngine.hasActive === 'function' && this.jogEngine.hasActive()){
+                                if(e && typeof e.preventDefault === 'function'){
+                                        e.preventDefault();
+                                }
+                        }
+                        this.stopAllHoldJogs();
+                },
+                axisIndex(letter){
+                        const map = { X: 0, Y: 1, Z: 2, A: 3 };
+                        const key = (letter || '').toUpperCase();
+                        return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : null;
+                },
+                getAxisPosInches(axisLetter){
+                        const axes = store?.state?.machine?.model?.move?.axes;
+                        if(!Array.isArray(axes)){
+                                return null;
+                        }
+                        const letter = axisLetter ? axisLetter.toUpperCase() : '';
+                        const axisIdx = this.axisIndex(letter);
+                        const axis = axisIdx !== null && typeof axisIdx === 'number'
+                                ? axes[axisIdx]
+                                : axes.find((ax) => ax.letter && ax.letter.toUpperCase() === letter);
+                        if(!axis || typeof axis.machinePosition !== 'number' || !Number.isFinite(axis.machinePosition)){
+                                return null;
+                        }
+                        const posIn = axis.machinePosition / 25.4;
+                        return Number.isFinite(posIn) ? posIn : null;
+                },
+                getAxisAccelMm(axisLetter){
+                        const axes = store?.state?.machine?.model?.move?.axes;
+                        if(!Array.isArray(axes)){
+                                return null;
+                        }
+                        const letter = axisLetter ? axisLetter.toUpperCase() : '';
+                        const axisIdx = this.axisIndex(letter);
+                        const axis = axisIdx !== null && typeof axisIdx === 'number'
+                                ? axes[axisIdx]
+                                : axes.find((ax) => ax.letter && ax.letter.toUpperCase() === letter);
+                        if(!axis){
+                                return null;
+                        }
+                        const candidates = [axis.acceleration, axis.maxAcceleration, axis.currentAcceleration];
+                        for(const candidate of candidates){
+                                if(typeof candidate === 'number' && Number.isFinite(candidate)){
+                                        return candidate;
+                                }
+                        }
+                        return null;
+                },
+                startHoldJog(btn, source = 'unknown'){
+                        if(this.editMode || this.settingsMode){
+                                return false;
+                        }
+                        if(btn.btnType !== 'JogHold'){
+                                return false;
+                        }
+                        if(this.chkJobEnabled(btn)){
+                                return false;
+                        }
+                        return this.jogEngine.startHold(btn, this.btnCmd.globalSettings, (code) => {
+                                return store.dispatch('machine/sendCode', code);
+                        }, this.getAxisPosInches, this.getAxisAccelMm, source);
+                },
+                stopHoldJog(btnID){
+                        this.jogEngine.stopHold(btnID);
+                },
+                isJogActive(btnID){
+                        return this.jogEngine.isActive(btnID);
+                },
+                dialogDisplayed(){
+                        if(this.dialog || this.showEdit || this.showTabEdit || this.showGSEdit || this.showESEdit || this.showInfo || this.showPanelEdit || this.showFileDialog){
+                                return true;
+                        }else {
+                                return false;
 			}
 		},		
 		getTabBtns(tabID){
@@ -1651,11 +1928,12 @@ export default {
 			}
 			this.btnCmd.panels.splice(requiredIndex, 1);
 		},
-		async editModeToggle(){
-			this.setActionResponse('');
-			var tmpCurrTabID = this.currTab
-			//this.tmpDebgug = this.currTab
-			this.editMode = !this.editMode;
+                async editModeToggle(){
+                        this.setActionResponse('');
+                        this.stopAllHoldJogs();
+                        var tmpCurrTabID = this.currTab
+                        //this.tmpDebgug = this.currTab
+                        this.editMode = !this.editMode;
 			if(this.editMode){
 				await this.$nextTick()
 				this.onChangeTab(tmpCurrTabID);
@@ -1663,12 +1941,13 @@ export default {
 			}else {
 				this.saveBtnCol = 'green';
 			}
-		},
-		createModeToggle(){
-			this.setActionResponse('');
-			this.createMode = !this.createMode;
-			this.lastLayoutTabID = this.currTab;
-			if(this.createMode){
+                },
+                createModeToggle(){
+                        this.setActionResponse('');
+                        this.stopAllHoldJogs();
+                        this.createMode = !this.createMode;
+                        this.lastLayoutTabID = this.currTab;
+                        if(this.createMode){
 				var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === true);
 				if(tmpArr.length >= 1){
 					this.onChangeTab(tmpArr[0].tabID);
@@ -1716,12 +1995,13 @@ export default {
 			}else {
 				this.brBtnCol = 'red';
 			}
-		},
-		onChangeTab(tmpTabID){
-			//console.log("Changing Tab to: ", tmpTabID)
-			this.currTab = tmpTabID;
-			//this.tmpDebgug = this.currTab
-			this.getCurrTabIndex = "tab-"+tmpTabID;
+                },
+                onChangeTab(tmpTabID){
+                        //console.log("Changing Tab to: ", tmpTabID)
+                        this.stopAllHoldJogs();
+                        this.currTab = tmpTabID;
+                        //this.tmpDebgug = this.currTab
+                        this.getCurrTabIndex = "tab-"+tmpTabID;
 			var tmpTabObj = this.btnCmd.tabs.filter(item => item.tabID == tmpTabID);
 			this.currTabObj = tmpTabObj[0];
 		},
@@ -1740,22 +2020,39 @@ export default {
 		}
 	},
 	//automated functions
-	mounted() {
-		this.directory = this.macrosDirectory;
-		this.initSettings();
-		this.checkDataVersion();
-		this.setupPage();
-		//Hide the top panel if set in global plugin settings and not on mobile device - this is needed for first load only
-		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.mobile){
-			this.toggleTopPanel(true);
-		}
-		//trys to load the default sbcc commands file
-		this.loadDefSBCCmds();
-	},
-	activated(){
-		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
-				this.toggleTopPanel(true);
-				this.updateForDesktop();
+        mounted() {
+                this.directory = this.macrosDirectory;
+                this.initSettings();
+                this.checkDataVersion();
+                this.setupPage();
+                this.loadKeyBindings();
+                window.addEventListener('keydown', this.onGlobalKeyDown);
+                window.addEventListener('keyup', this.onGlobalKeyUp);
+                window.addEventListener('blur', this.onWindowBlur, { passive: true });
+                document.addEventListener('visibilitychange', this.onVisibilityChange, { passive: true });
+                window.addEventListener('pointercancel', this.onPointerCancelGlobal, { passive: true });
+                window.addEventListener('contextmenu', this.onContextMenuGlobal);
+                //Hide the top panel if set in global plugin settings and not on mobile device - this is needed for first load only
+                if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.mobile){
+                        this.toggleTopPanel(true);
+                }
+                //trys to load the default sbcc commands file
+                this.loadDefSBCCmds();
+        },
+        beforeDestroy(){
+                window.removeEventListener('keydown', this.onGlobalKeyDown);
+                window.removeEventListener('keyup', this.onGlobalKeyUp);
+                window.removeEventListener('blur', this.onWindowBlur);
+                document.removeEventListener('visibilitychange', this.onVisibilityChange);
+                window.removeEventListener('pointercancel', this.onPointerCancelGlobal);
+                window.removeEventListener('contextmenu', this.onContextMenuGlobal);
+                Object.keys(this.activeKeydowns).forEach((btnID) => this.stopHoldJog(btnID));
+                this.jogEngine.stopAll();
+        },
+        activated(){
+                if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
+                                this.toggleTopPanel(true);
+                                this.updateForDesktop();
 		}
 	},
 
@@ -1798,14 +2095,28 @@ export default {
 				this.updateForDesktop();
 			}
 		},
-		reloadSBCCSet (val) {
-			//watches for reload  flag for SBCC commands if enabled
-			if(this.btnCmd.globalSettings.enableSBCC && val){
-				//console.log("reloading SBCC Settings");
-				this.loadSBCCSettingsFromFile();
-				this.reloadSBCCSet = false;
-			}
-		}
-	}
+                reloadSBCCSet (val) {
+                        //watches for reload  flag for SBCC commands if enabled
+                        if(this.btnCmd.globalSettings.enableSBCC && val){
+                                //console.log("reloading SBCC Settings");
+                                this.loadSBCCSettingsFromFile();
+                                this.reloadSBCCSet = false;
+                        }
+                },
+                keyboardJogEnabled(val){
+                        if(this.btnCmd && this.btnCmd.globalSettings){
+                                this.$set(this.btnCmd.globalSettings, 'enableKeyboardControl', val);
+                                this.$set(this.btnCmd.globalSettings, 'enableKeyboardJog', val);
+                        }
+                        if(!val){
+                                this.stopAllHoldJogs();
+                        }
+                },
+                settingsMode(val){
+                        if(val){
+                                this.stopAllHoldJogs();
+                        }
+                }
+        }
 }
 </script>

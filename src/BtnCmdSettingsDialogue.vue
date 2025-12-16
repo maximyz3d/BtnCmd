@@ -41,6 +41,16 @@
                         </v-col>
                     </v-row>
                     <v-row class="mx-2 my-n4" dense>
+                        <v-col cols="12">
+                            <div class="d-flex align-center flex-wrap">
+                                <span class="mr-3">Current Binding: {{ bindingLabel }}</span>
+                                <v-btn x-small color="primary" class="mr-2" @click="startKeyCapture">Bind Key</v-btn>
+                                <v-btn x-small color="secondary" class="mr-2" @click="onClearBinding">Clear Key</v-btn>
+                                <span v-if="capturingKey" class="red--text">Press any key...</span>
+                            </div>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense>
                         <v-col cols="11">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -81,7 +91,15 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType!='SBCC'" :key="'adr' + passedObject.btnType + passedObject.btnID">
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType=='JogHold'">
+                        <v-col cols="6">
+                            <v-select :items="axisItems" class="custom-label-color" label="Axis" v-model="passedObject.btnJogAxis"></v-select>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-select :items="dirItems" class="custom-label-color" label="Direction" v-model="passedObject.btnJogDir"></v-select>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType!='SBCC' && passedObject.btnType!='JogHold'" :key="'adr' + passedObject.btnType + passedObject.btnID">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -170,6 +188,9 @@
             bMQTT: Boolean,
             enableSBCC: Boolean,
             SBCCCombinedJson: Array,
+            keyBinding: Object,
+            setKeyBinding: Function,
+            clearKeyBinding: Function,
         },
         computed: {
             show: {
@@ -187,6 +208,7 @@
                     {text: 'gcode', value: 'gcode', disabled: false},
                     {text: 'MQTT', value: 'MQTT', disabled: !this.bMQTT},
                     {text: 'Window', value: 'window', disabled: false},
+                    {text: 'Jog Hold', value: 'JogHold', disabled: false},
                     {text: 'SBC Cmd', value: 'SBCC', disabled: !this.enableSBCC}
                 ]
             },
@@ -205,6 +227,15 @@
                     {text: 'JSON', value: 'json', disabled: false}
                 ]
             },
+            bindingLabel(){
+                if(this.keyBinding && (this.keyBinding.code || this.keyBinding.key)){
+                    if(this.keyBinding.code && this.keyBinding.key){
+                        return `${this.keyBinding.key} (${this.keyBinding.code})`;
+                    }
+                    return this.keyBinding.code || this.keyBinding.key;
+                }
+                return 'None';
+            },
             SBCCmdListItems() {
                 var SBCCItem = null;
                 var tmpItems = [];
@@ -222,10 +253,50 @@
         data: function () {
             return {
                 alertReqVal: false,
-                alertBadJSON: false
+                alertBadJSON: false,
+                capturingKey: false,
+                axisItems: [
+                    {text: 'X', value: 'X'},
+                    {text: 'Y', value: 'Y'},
+                    {text: 'Z', value: 'Z'},
+                    {text: 'A', value: 'A'},
+                ],
+                dirItems: [
+                    {text: 'Positive (+)', value: '+'},
+                    {text: 'Negative (-)', value: '-'},
+                ]
             }
         },
         methods: {
+            startKeyCapture(){
+                if(this.capturingKey){
+                    return;
+                }
+                this.capturingKey = true;
+                this.$emit('capture-start');
+                window.addEventListener('keydown', this.captureKey);
+            },
+            stopKeyCapture(){
+                this.capturingKey = false;
+                this.$emit('capture-end');
+                window.removeEventListener('keydown', this.captureKey);
+            },
+            captureKey(event){
+                if(!this.capturingKey){
+                    return;
+                }
+                event.preventDefault();
+                event.stopPropagation();
+                if(this.setKeyBinding && this.passedObject && this.passedObject.btnID){
+                    this.setKeyBinding(this.passedObject.btnID, {key: event.key, code: event.code});
+                }
+                this.stopKeyCapture();
+            },
+            onClearBinding(){
+                if(this.clearKeyBinding && this.passedObject && this.passedObject.btnID){
+                    this.clearKeyBinding(this.passedObject.btnID);
+                }
+            },
             async sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
             },
@@ -235,6 +306,7 @@
                 if (this.passedObject.btnType == "MQTT") {return "MQTT MSG*";}
                 if (this.passedObject.btnType == "gcode") {return "gcode Command*";}
                 if (this.passedObject.btnType == "window") {return "PopUp URL*";}
+                if (this.passedObject.btnType == "JogHold") {return "";}
             },
             actionHover() {
                 if (this.passedObject.btnType == "Macro") {return "Enter the full macro filename [name.g]";}
@@ -242,6 +314,7 @@
                 if (this.passedObject.btnType == "MQTT") {return "Enter the message text to send";}
                 if (this.passedObject.btnType == "gcode") {return "Enter the gcode command to send";}
                 if (this.passedObject.btnType == "window") {return "Enter the Window PopUp URL*";}
+                if (this.passedObject.btnType == "JogHold") {return "";}
             },
             replaceModelKeys(textToCheckStr){
                 //this is used to remove global variables so json parse check can work
@@ -273,6 +346,16 @@
                 return;
             },
             async validateData() {
+                if(this.passedObject.btnType === 'JogHold'){
+                    if(!this.passedObject.btnLabel && !this.passedObject.btnIcon){
+                        this.alertReqVal = true;
+                        await this.sleep(2000);
+                        this.alertReqVal = false;
+                        return;
+                    }
+                    this.show = false;
+                    return;
+                }
                 if (this.passedObject.btnActionData) {
                     if (this.passedObject.btnType == "MQTT" && !this.passedObject.btnTopicData){
                         this.alertReqVal = true;
@@ -309,6 +392,9 @@
                     }
                 }
             }
+        },
+        beforeDestroy(){
+            this.stopKeyCapture();
         }
 
     }
