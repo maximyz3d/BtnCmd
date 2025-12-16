@@ -7,7 +7,8 @@ const defaultGlobals = Vue.observable({
 });
 
 const sharedState = Vue.observable({
-    global: defaultGlobals
+    global: defaultGlobals,
+    sourceRef: null
 });
 
 function coerceKeyboardValue(val) {
@@ -33,16 +34,34 @@ function ensureKeyboardFields(settings) {
 }
 
 function setGlobalSettingsRef(globalSettings) {
+    const target = sharedState.global || Vue.observable({});
     if (globalSettings) {
         ensureKeyboardFields(globalSettings);
-        sharedState.global = globalSettings;
+        sharedState.sourceRef = globalSettings;
+        Object.keys(globalSettings).forEach((key) => {
+            if (!Object.prototype.hasOwnProperty.call(target, key)) {
+                Vue.set(target, key, globalSettings[key]);
+            } else {
+                target[key] = globalSettings[key];
+            }
+        });
     } else {
-        sharedState.global = defaultGlobals;
+        sharedState.sourceRef = null;
+        Object.keys(target).forEach((key) => {
+            if (Object.prototype.hasOwnProperty.call(defaultGlobals, key)) {
+                target[key] = defaultGlobals[key];
+            }
+        });
     }
+    sharedState.global = target;
+}
+
+function getGlobal() {
+    return sharedState.global || defaultGlobals;
 }
 
 function getEnableKeyboardJog() {
-    const gs = sharedState.global;
+    const gs = getGlobal();
     if (!gs) {
         return false;
     }
@@ -53,16 +72,18 @@ function getEnableKeyboardJog() {
 }
 
 function setEnableKeyboardJog(val) {
-    if (!sharedState.global) {
-        return;
-    }
+    const gs = getGlobal();
     const coerced = coerceKeyboardValue(val);
-    sharedState.global.enableKeyboardJog = coerced;
-    sharedState.global.enableKeyboardControl = coerced;
+    gs.enableKeyboardJog = coerced;
+    gs.enableKeyboardControl = coerced;
+    if (sharedState.sourceRef && sharedState.sourceRef !== gs) {
+        sharedState.sourceRef.enableKeyboardJog = coerced;
+        sharedState.sourceRef.enableKeyboardControl = coerced;
+    }
 }
 
 function getJogFeedrateIPM() {
-    const gs = sharedState.global;
+    const gs = getGlobal();
     if (!gs) {
         return null;
     }
@@ -70,15 +91,19 @@ function getJogFeedrateIPM() {
 }
 
 function setJogFeedrateIPM(val) {
-    if (!sharedState.global) {
+    const gs = getGlobal();
+    if (!gs) {
         return;
     }
-    sharedState.global.jogFeedrateIPM = val;
+    gs.jogFeedrateIPM = val;
+    if (sharedState.sourceRef && sharedState.sourceRef !== gs) {
+        sharedState.sourceRef.jogFeedrateIPM = val;
+    }
 }
 
 export default {
-    global: sharedState.global,
     state: sharedState,
+    getGlobal,
     setGlobalSettingsRef,
     getEnableKeyboardJog,
     setEnableKeyboardJog,
