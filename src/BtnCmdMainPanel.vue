@@ -1018,7 +1018,10 @@ export default {
                                         enableBounceAtLoad: false,
                                         bounceAtLoadDelay: 1,
                                         jogFeedrateIPM: 120,
-                                        jogSegmentInches: 0.1
+                                        jogSegmentInches: 0.1,
+                                        jogSegmentScale: 1.0,
+                                        jogMinSegmentInches: 0.1,
+                                        jogMaxSegmentInches: 6.0
                                 },
 				SBCCSettings: {					
 					HTTP_Port: "8091",
@@ -1588,6 +1591,23 @@ export default {
                         }
                         return axis.machinePosition;
                 },
+                getAxisAccelMm(axisLetter){
+                        const axes = store?.state?.machine?.model?.move?.axes;
+                        if(!Array.isArray(axes)){
+                                return null;
+                        }
+                        const axis = axes.find((ax) => ax.letter && ax.letter.toUpperCase() === axisLetter.toUpperCase());
+                        if(!axis){
+                                return null;
+                        }
+                        const candidates = [axis.acceleration, axis.maxAcceleration, axis.currentAcceleration];
+                        for(const candidate of candidates){
+                                if(typeof candidate === 'number' && Number.isFinite(candidate)){
+                                        return candidate;
+                                }
+                        }
+                        return null;
+                },
                 startHoldJog(btn, source = 'unknown'){
                         if(this.editMode || this.settingsMode){
                                 return false;
@@ -1600,7 +1620,7 @@ export default {
                         }
                         return this.jogEngine.startHold(btn, this.btnCmd.globalSettings, (code) => {
                                 return store.dispatch('machine/sendCode', code);
-                        }, this.getAxisPosInches, source);
+                        }, this.getAxisPosInches, this.getAxisAccelMm, source);
                 },
                 stopHoldJog(btnID){
                         this.jogEngine.stopHold(btnID);

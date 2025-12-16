@@ -43,7 +43,10 @@ export default {
                                         enableBounceAtLoad: false,
                                         bounceAtLoadDelay: 1,
                                         jogFeedrateIPM: 120,
-                                        jogSegmentInches: 0.1
+                                        jogSegmentInches: 0.1,
+                                        jogSegmentScale: 1.0,
+                                        jogMinSegmentInches: 0.1,
+                                        jogMaxSegmentInches: 6.0
                                 },
 				SBCCSettings: {					
 					HTTP_Port: "8091",

@@ -3,20 +3,28 @@ export default class BtnCmdHoldJogEngine {
         this.activeAxes = new Map();
         this.btnAxisMap = new Map();
         this.defaultSegment = 0.1;
+        this.defaultSegmentScale = 1.0;
+        this.defaultMinSegment = 0.1;
+        this.defaultMaxSegment = 6.0;
         this.defaultFeedrate = 120;
         this.defaultPollIntervalMs = 35;
         this.pollTimer = null;
         this.sendCodeFn = null;
         this.getAxisPosInchesFn = null;
+        this.getAxisAccelMmFn = null;
         this.segIn = this.defaultSegment;
+        this.segScale = this.defaultSegmentScale;
+        this.minSegIn = this.defaultMinSegment;
+        this.maxSegIn = this.defaultMaxSegment;
         this.feedIpm = this.defaultFeedrate;
         this.bufferMaxIn = 0.5;
         this.inFlight = 0;
         this.maxInFlight = 1;
         this.controlSource = null;
+        this.missingAccelWarned = new Set();
     }
 
-    startHold(btn, globalSettings, sendCodeFn, getAxisPosInchesFn, source = 'unknown') {
+    startHold(btn, globalSettings, sendCodeFn, getAxisPosInchesFn, getAxisAccelMmFn, source = 'unknown') {
         if (!btn || !btn.btnID) {
             return false;
         }
@@ -28,8 +36,14 @@ export default class BtnCmdHoldJogEngine {
             return true;
         }
         const segSetting = Number(globalSettings?.jogSegmentInches);
+        const segScaleSetting = Number(globalSettings?.jogSegmentScale);
+        const minSegSetting = Number(globalSettings?.jogMinSegmentInches);
+        const maxSegSetting = Number(globalSettings?.jogMaxSegmentInches);
         const feedSetting = Number(globalSettings?.jogFeedrateIPM);
         const segIn = Math.abs(segSetting) || this.defaultSegment;
+        const segScale = Math.abs(segScaleSetting) || this.defaultSegmentScale;
+        const minSegIn = Math.abs(minSegSetting) || this.defaultMinSegment;
+        const maxSegIn = Math.abs(maxSegSetting) || this.defaultMaxSegment;
         const feedIpm = Math.abs(feedSetting) || this.defaultFeedrate;
         if (!segIn || !feedIpm || !btn.btnJogAxis || !btn.btnJogDir || typeof sendCodeFn !== 'function') {
             return false;
@@ -64,9 +78,13 @@ export default class BtnCmdHoldJogEngine {
         }
 
         this.segIn = segIn;
+        this.segScale = segScale;
+        this.minSegIn = minSegIn;
+        this.maxSegIn = Math.max(this.minSegIn, maxSegIn);
         this.feedIpm = feedIpm;
         this.sendCodeFn = sendCodeFn;
         this.getAxisPosInchesFn = getAxisPosInchesFn;
+        this.getAxisAccelMmFn = getAxisAccelMmFn;
         if (!this.controlSource) {
             this.controlSource = sourceTag;
         }
@@ -112,15 +130,17 @@ export default class BtnCmdHoldJogEngine {
             return;
         }
 
-        const segIn = this.segIn || this.defaultSegment;
+        const axisStates = Array.from(this.activeAxes.values());
+        const axisLetters = axisStates.map((axisState) => axisState.axisLetter);
         const feedIpm = this.feedIpm || this.defaultFeedrate;
-        const segTimeMs = (segIn / (feedIpm / 60)) * 1000;
+        const segInDynamic = this.computeDynamicSegIn(feedIpm, axisLetters, this.segIn || this.defaultSegment);
+        const segTimeMs = (segInDynamic / (feedIpm / 60)) * 1000;
         this.bufferMaxIn = this.defaultPollIntervalMs > segTimeMs * 0.8 ? 1.0 : 0.5;
         this.maxInFlight = segTimeMs < this.defaultPollIntervalMs ? 2 : 1;
 
-        const axisStates = Array.from(this.activeAxes.values());
         const bufferedAheadValues = [];
         let validCount = 0;
+        let backlogExceeded = false;
 
         axisStates.forEach((axisState) => {
             const currentPos = typeof this.getAxisPosInchesFn === 'function'
@@ -132,13 +152,17 @@ export default class BtnCmdHoldJogEngine {
             }
             validCount += 1;
             bufferedAheadValues.push(axisState.dirSign * (axisState.sentTargetPos - currentPos));
+            const backlogDistanceIn = Math.abs(axisState.sentTargetPos - currentPos);
+            if (backlogDistanceIn > 2 * segInDynamic) {
+                backlogExceeded = true;
+            }
         });
 
         if (validCount === 0) {
             if (this.inFlight < this.maxInFlight) {
-                this.sendCombinedSegment(axisStates, segIn, feedIpm);
+                this.sendCombinedSegment(axisStates, segInDynamic, feedIpm);
                 axisStates.forEach((axisState) => {
-                    axisState.sentTargetPos += axisState.dirSign * segIn;
+                    axisState.sentTargetPos += axisState.dirSign * segInDynamic;
                 });
             }
             return;
@@ -148,14 +172,18 @@ export default class BtnCmdHoldJogEngine {
             return;
         }
 
+        if (backlogExceeded) {
+            return;
+        }
+
         let minBufferedAhead = Math.min(...bufferedAheadValues);
         while (minBufferedAhead < this.bufferMaxIn && this.inFlight < this.maxInFlight) {
-            this.sendCombinedSegment(axisStates, segIn, feedIpm);
+            this.sendCombinedSegment(axisStates, segInDynamic, feedIpm);
             axisStates.forEach((axisState) => {
-                axisState.sentTargetPos += axisState.dirSign * segIn;
+                axisState.sentTargetPos += axisState.dirSign * segInDynamic;
             });
             bufferedAheadValues.forEach((_, idx) => {
-                bufferedAheadValues[idx] += segIn;
+                bufferedAheadValues[idx] += segInDynamic;
             });
             minBufferedAhead = Math.min(...bufferedAheadValues);
         }
@@ -183,5 +211,41 @@ export default class BtnCmdHoldJogEngine {
         }
         this.inFlight = 0;
         this.controlSource = null;
+        this.missingAccelWarned.clear();
+    }
+
+    computeDynamicSegIn(feedIpm, axisLettersInMove, fallbackSegIn) {
+        const axisLetters = Array.isArray(axisLettersInMove) ? axisLettersInMove : [];
+        let limitingAccelIn = null;
+        axisLetters.forEach((letter) => {
+            const accelMm = typeof this.getAxisAccelMmFn === 'function' ? this.getAxisAccelMmFn(letter) : null;
+            const accelIn = accelMm && Number.isFinite(accelMm) ? accelMm / 25.4 : null;
+            if (!accelIn || accelIn <= 0) {
+                if (!this.missingAccelWarned.has(letter)) {
+                    console.warn(`[BtnCmdHoldJogEngine] Missing or invalid acceleration for axis ${letter}; using fixed segment.`);
+                    this.missingAccelWarned.add(letter);
+                }
+                return;
+            }
+            if (limitingAccelIn === null || accelIn < limitingAccelIn) {
+                limitingAccelIn = accelIn;
+            }
+        });
+
+        const fallback = Math.abs(fallbackSegIn) || this.defaultSegment;
+        if (limitingAccelIn === null) {
+            return this.clamp(fallback, this.minSegIn, this.maxSegIn);
+        }
+
+        const vIn = Math.abs(feedIpm) / 60;
+        const dAccel = (vIn * vIn) / (2 * limitingAccelIn || 1);
+        const scaled = this.segScale * dAccel;
+        return this.clamp(scaled, this.minSegIn, this.maxSegIn);
+    }
+
+    clamp(value, min, max) {
+        const safeMin = Number.isFinite(min) ? min : this.defaultMinSegment;
+        const safeMax = Number.isFinite(max) ? max : this.defaultMaxSegment;
+        return Math.min(Math.max(value, safeMin), safeMax);
     }
 }

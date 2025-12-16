@@ -49,6 +49,19 @@
                             <v-text-field type="number" class="custom-label-color" label="Jog Segment Length (inches)" v-model.number="passedObject.jogSegmentInches" step="0.01"></v-text-field>
                         </v-col>
                     </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-text-field type="number" class="custom-label-color" label="Jog Segment Scale" v-model.number="passedObject.jogSegmentScale" step="0.05"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="6">
+                            <v-text-field type="number" class="custom-label-color" label="Jog Min Segment (inches)" v-model.number="passedObject.jogMinSegmentInches" step="0.01"></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field type="number" class="custom-label-color" label="Jog Max Segment (inches)" v-model.number="passedObject.jogMaxSegmentInches" step="0.1"></v-text-field>
+                        </v-col>
+                    </v-row>
                     <v-row dense v-if="showToggButt">
                         <v-col cols="12">
                             <v-tooltip bottom>
