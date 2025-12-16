@@ -1181,49 +1181,58 @@ export default {
 				]
 			}
 		}
-	},
-	created() {
-		if(this.mobileActive){
-			this.updateForMobile();
-		}else{
-			this.updateForDesktop();
-		}
-		window.addEventListener("resize", this.onResize);
-	},
-	destroyed() {
-		window.removeEventListener("resize", this.onResize);
-	},
-    methods: {
-		
-		setupPage(){
-			this.onChangeTab(this.btnCmd.tabs[0].tabID);
 		},
-		//DWC Z index 
-		//dirty hack to stop the core dwc elements rendering behind some BtnCmd user created objects - mitigates issues with zIndex
-		onResize(){
+		created() {
 			if(this.mobileActive){
-				try{
-					//console.log("triggering mobile");
-					this.toggleTopPanel(false);
-					window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight;
-					window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight;
-					this.updateForMobile();
-				}
-				catch{
-					return
-				}
+				this.updateForMobile();
 			}else{
-				try{	
-					//console.log("triggering desktop")
-					window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70;
-					window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70;
-					this.updateForDesktop();
-				}
-				catch{
-					return
-				}
+				this.updateForDesktop();
 			}
 		},
+	    methods: {
+			
+			setupPage(){
+				this.onChangeTab(this.btnCmd.tabs[0].tabID);
+			},
+		//DWC Z index 
+		//dirty hack to stop the core dwc elements rendering behind some BtnCmd user created objects - mitigates issues with zIndex
+			safeGetEl(id){
+				try{
+					return window.document.getElementById(id);
+				}catch{
+					return null;
+				}
+			},
+			onResize(){
+				const mainDiv = this.safeGetEl("BtnCmdMainDiv");
+				const mainTab = this.safeGetEl("BtnCmdMainTabCard");
+				const globalContainer = this.safeGetEl("global-container");
+
+				if(!mainDiv || !mainTab){
+					return;
+				}
+
+				if(this.mobileActive){
+					try{
+						this.toggleTopPanel(false);
+						mainDiv.height = window.innerHeight;
+						mainTab.height = window.innerHeight;
+						this.updateForMobile();
+					}
+					catch{
+						return;
+					}
+				}else{
+					try{	
+						mainDiv.height = window.innerHeight - 70;
+						mainTab.height = window.innerHeight - 70;
+						this.updateForDesktop();
+					}
+					catch{
+						return;
+					}
+				}
+			},
 		updateForMobile(){
 			//not needed so far but here just in case
 			return
@@ -1257,28 +1266,37 @@ export default {
 				return window.innerHeight;
 			}
 		},
-		toggleTopPanelBtn(){
-			this.currHideTopPanel = !this.currHideTopPanel;
-			this.toggleTopPanel(this.currHideTopPanel);
-		},
-                toggleTopPanel(bHideGCPanel){
-                        if(bHideGCPanel){
-                                window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
-                                window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
-                                window.document.getElementById("global-container").hidden = true;
-                                this.currHideTopPanel = true;
-                        }else {
-                                window.document.getElementById("global-container").hidden = false;
-                                if(this.mobileActive){
-                                        window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight;
-                                        window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight;
-                                }else{
-                                        window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70;
-                                        window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70;
-                                }
-                                this.currHideTopPanel = false;
-                        }
-                },
+			toggleTopPanelBtn(){
+				this.currHideTopPanel = !this.currHideTopPanel;
+				this.toggleTopPanel(this.currHideTopPanel);
+			},
+	                toggleTopPanel(bHideGCPanel){
+	                        const mainDiv = this.safeGetEl("BtnCmdMainDiv");
+	                        const mainTab = this.safeGetEl("BtnCmdMainTabCard");
+	                        const globalContainer = this.safeGetEl("global-container");
+
+	                        if(!mainDiv || !mainTab || !globalContainer){
+	                                return;
+	                        }
+
+	                        if(bHideGCPanel){
+	                                const gcH = globalContainer.offsetHeight || 0;
+	                                mainDiv.height = window.innerHeight - 70 + gcH;
+	                                mainTab.height = window.innerHeight - 70 + gcH;
+	                                globalContainer.hidden = true;
+	                                this.currHideTopPanel = true;
+	                        }else {
+	                                globalContainer.hidden = false;
+	                                if(this.mobileActive){
+	                                        mainDiv.height = window.innerHeight;
+	                                        mainTab.height = window.innerHeight;
+	                                }else{
+	                                        mainDiv.height = window.innerHeight - 70;
+	                                        mainTab.height = window.innerHeight - 70;
+	                                }
+	                                this.currHideTopPanel = false;
+	                        }
+		                },
 		getBottomPixels() {
 			if(this.showBottomNavigation) {
 				try{
@@ -1295,35 +1313,40 @@ export default {
 				return 0;
 			}
 		},
-		//PopUpMenu Functions
-		doMenu (e, btnObj) {
-			e.preventDefault();
-			this.onDragClick(btnObj);
-			this.showMenu = false
-			this.menuX = e.clientX
-			this.menuY = e.clientY
-			this.$nextTick(() => {
-				this.showMenu = true
-			})
-		},
-		doPanelMenu (e, panel) {
-			e.preventDefault();
-			this.panelObjectToPass = panel;
-			this.showPanelMenu = false
-			this.menuX = e.clientX
-			this.menuY = e.clientY
-			this.$nextTick(() => {
-				this.showPanelMenu = true
-			})
-		},
-		afterAddPanel(){
-			//function runs after closing add panel dialog
-			if(this.panelObjectToPass[0].panelType == "altwebcam"){
-				this.showAWCPanelEdit = true;
-			}
-			if(this.panelObjectToPass[0].panelType == "mmValue" || this.panelObjectToPass[0].panelType == "txtLabel"){
-				this.showMMPanelEdit = true;
-			}
+			//PopUpMenu Functions
+			doMenu (e, btnObj) {
+				e.preventDefault();
+				this.stopAllHoldJogs();
+				this.onDragClick(btnObj);
+				this.showMenu = false
+				this.menuX = e.clientX
+				this.menuY = e.clientY
+				this.$nextTick(() => {
+					this.showMenu = true
+				})
+			},
+			doPanelMenu (e, panel) {
+				e.preventDefault();
+				this.stopAllHoldJogs();
+				this.panelObjectToPass = panel;
+				this.showPanelMenu = false
+				this.menuX = e.clientX
+				this.menuY = e.clientY
+				this.$nextTick(() => {
+					this.showPanelMenu = true
+				})
+			},
+			afterAddPanel(){
+				//function runs after closing add panel dialog
+				if(!this.panelObjectToPass || !Array.isArray(this.panelObjectToPass) || !this.panelObjectToPass[0]){
+					return;
+				}
+				if(this.panelObjectToPass[0].panelType == "altwebcam"){
+					this.showAWCPanelEdit = true;
+				}
+				if(this.panelObjectToPass[0].panelType == "mmValue" || this.panelObjectToPass[0].panelType == "txtLabel"){
+					this.showMMPanelEdit = true;
+				}
 			if(this.panelObjectToPass[0].panelType == "vInput"){
 				this.showVInputPanelEdit = true;
 			}
@@ -1597,12 +1620,14 @@ export default {
                         this.stopHoldJog(btn.btnID);
                 },
                 stopAllHoldJogs(){
-                        this.jogEngine.stopAll();
-                        Object.keys(this.activeKeydowns).forEach((btnID) => {
-                                this.stopHoldJog(btnID);
-                                this.$delete(this.activeKeydowns, btnID);
-                        });
-                        this.activeKeydowns = {};
+                        if(this.jogEngine){
+                                this.jogEngine.stopAll();
+                        }
+                        if(this.activeKeydowns){
+                                Object.keys(this.activeKeydowns).forEach((btnID) => {
+                                        this.$delete(this.activeKeydowns, btnID);
+                                });
+                        }
                 },
                 onWindowBlur(){
                         this.stopAllHoldJogs();
@@ -2026,6 +2051,7 @@ export default {
                 this.checkDataVersion();
                 this.setupPage();
                 this.loadKeyBindings();
+                window.addEventListener("resize", this.onResize);
                 window.addEventListener('keydown', this.onGlobalKeyDown);
                 window.addEventListener('keyup', this.onGlobalKeyUp);
                 window.addEventListener('blur', this.onWindowBlur, { passive: true });
@@ -2040,14 +2066,21 @@ export default {
                 this.loadDefSBCCmds();
         },
         beforeDestroy(){
+                window.removeEventListener("resize", this.onResize);
                 window.removeEventListener('keydown', this.onGlobalKeyDown);
                 window.removeEventListener('keyup', this.onGlobalKeyUp);
                 window.removeEventListener('blur', this.onWindowBlur);
                 document.removeEventListener('visibilitychange', this.onVisibilityChange);
                 window.removeEventListener('pointercancel', this.onPointerCancelGlobal);
                 window.removeEventListener('contextmenu', this.onContextMenuGlobal);
-                Object.keys(this.activeKeydowns).forEach((btnID) => this.stopHoldJog(btnID));
-                this.jogEngine.stopAll();
+                if(this.jogEngine){
+                        this.jogEngine.stopAll();
+                }
+                if(this.activeKeydowns){
+                        Object.keys(this.activeKeydowns).forEach((btnID) => {
+                                this.$delete(this.activeKeydowns, btnID);
+                        });
+                }
         },
         activated(){
                 if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
