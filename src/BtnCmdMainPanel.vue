@@ -277,7 +277,7 @@
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
-                                                                                                                                   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
+   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																					<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																					<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																				</v-btn>
@@ -288,7 +288,7 @@
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
-                                                                                                                                   <v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
+   <v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																					<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																					<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																				</v-btn>
@@ -298,13 +298,13 @@
 																	</div>
 																	<!--Non tooltip buttons-->
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-                                                                                                                                   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
+   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
 																	</div>
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0">
-                                                                                                                                   <v-btn v-if="btn.autoSize" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
+   <v-btn v-if="btn.autoSize" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
@@ -1261,17 +1261,24 @@ export default {
 			this.currHideTopPanel = !this.currHideTopPanel;
 			this.toggleTopPanel(this.currHideTopPanel);
 		},
-		toggleTopPanel(bHideGCPanel){
-			if(bHideGCPanel){
-				window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
-				window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
-				window.document.getElementById("global-container").hidden = true;
-				this.currHideTopPanel = true;
-			}else {
-				window.document.getElementById("global-container").hidden = false;
-				this.currHideTopPanel = false;
-			}
-		},		
+                toggleTopPanel(bHideGCPanel){
+                        if(bHideGCPanel){
+                                window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
+                                window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
+                                window.document.getElementById("global-container").hidden = true;
+                                this.currHideTopPanel = true;
+                        }else {
+                                window.document.getElementById("global-container").hidden = false;
+                                if(this.mobileActive){
+                                        window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight;
+                                        window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight;
+                                }else{
+                                        window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70;
+                                        window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70;
+                                }
+                                this.currHideTopPanel = false;
+                        }
+                },
 		getBottomPixels() {
 			if(this.showBottomNavigation) {
 				try{
@@ -1581,6 +1588,14 @@ export default {
                         }
                         this.stopHoldJog(btn.btnID);
                 },
+                stopAllHoldJogs(){
+                        this.jogEngine.stopAll();
+                        Object.keys(this.activeKeydowns).forEach((btnID) => {
+                                this.stopHoldJog(btnID);
+                                this.$delete(this.activeKeydowns, btnID);
+                        });
+                        this.activeKeydowns = {};
+                },
                 axisIndex(letter){
                         const map = { X: 0, Y: 1, Z: 2, A: 3 };
                         const key = (letter || '').toUpperCase();
@@ -1886,11 +1901,12 @@ export default {
 			}
 			this.btnCmd.panels.splice(requiredIndex, 1);
 		},
-		async editModeToggle(){
-			this.setActionResponse('');
-			var tmpCurrTabID = this.currTab
-			//this.tmpDebgug = this.currTab
-			this.editMode = !this.editMode;
+                async editModeToggle(){
+                        this.setActionResponse('');
+                        this.stopAllHoldJogs();
+                        var tmpCurrTabID = this.currTab
+                        //this.tmpDebgug = this.currTab
+                        this.editMode = !this.editMode;
 			if(this.editMode){
 				await this.$nextTick()
 				this.onChangeTab(tmpCurrTabID);
@@ -1898,12 +1914,13 @@ export default {
 			}else {
 				this.saveBtnCol = 'green';
 			}
-		},
-		createModeToggle(){
-			this.setActionResponse('');
-			this.createMode = !this.createMode;
-			this.lastLayoutTabID = this.currTab;
-			if(this.createMode){
+                },
+                createModeToggle(){
+                        this.setActionResponse('');
+                        this.stopAllHoldJogs();
+                        this.createMode = !this.createMode;
+                        this.lastLayoutTabID = this.currTab;
+                        if(this.createMode){
 				var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === true);
 				if(tmpArr.length >= 1){
 					this.onChangeTab(tmpArr[0].tabID);
@@ -1951,12 +1968,13 @@ export default {
 			}else {
 				this.brBtnCol = 'red';
 			}
-		},
-		onChangeTab(tmpTabID){
-			//console.log("Changing Tab to: ", tmpTabID)
-			this.currTab = tmpTabID;
-			//this.tmpDebgug = this.currTab
-			this.getCurrTabIndex = "tab-"+tmpTabID;
+                },
+                onChangeTab(tmpTabID){
+                        //console.log("Changing Tab to: ", tmpTabID)
+                        this.stopAllHoldJogs();
+                        this.currTab = tmpTabID;
+                        //this.tmpDebgug = this.currTab
+                        this.getCurrTabIndex = "tab-"+tmpTabID;
 			var tmpTabObj = this.btnCmd.tabs.filter(item => item.tabID == tmpTabID);
 			this.currTabObj = tmpTabObj[0];
 		},
@@ -2056,10 +2074,12 @@ export default {
                                 this.$set(this.btnCmd.globalSettings, 'enableKeyboardJog', val);
                         }
                         if(!val){
-                                Object.keys(this.activeKeydowns).forEach((btnID) => {
-                                        this.stopHoldJog(btnID);
-                                        this.$delete(this.activeKeydowns, btnID);
-                                });
+                                this.stopAllHoldJogs();
+                        }
+                },
+                settingsMode(val){
+                        if(val){
+                                this.stopAllHoldJogs();
                         }
                 }
         }
