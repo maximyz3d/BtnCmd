@@ -33,7 +33,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Keyboard Control" v-model="passedObject.enableKeyboardControl"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Keyboard Motion" v-model="passedObject.enableKeyboardJog" @change="syncKeyboardToggle"></v-switch></span>
                                 </template>
                                 <span>When enabled, configured keys can trigger BtnCmd buttons.</span>
                             </v-tooltip>
@@ -251,6 +251,13 @@
         methods: {
             async sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
+            },
+            syncKeyboardToggle(val){
+                if(!this.passedObject){
+                    return;
+                }
+                this.$set(this.passedObject, 'enableKeyboardJog', !!val);
+                this.$set(this.passedObject, 'enableKeyboardControl', !!val);
             },
             async validateData() {
                 if(this.enableAutoBackup && this.ABackupFileName.length < 1){

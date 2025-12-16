@@ -789,6 +789,7 @@ import BtnCmdListPanel from './BtnCmdListPanel.vue';
 import BtnCmdChart from './BtnCmdChart.vue';
 import BtnCmdChartPanelDialogue from './BtnCmdChartPanelDialogue.vue';
 import BtnCmdHoldJogEngine from './BtnCmdHoldJogEngine';
+import BtnCmdSharedSettings from './BtnCmdSharedSettings';
 
 const KEYMAP_STORAGE_KEY = 'btncmd_keymap_v1';
 
@@ -899,14 +900,17 @@ export default {
 			var tmpCmdsObj = sbbcMerge(this.tmpSBCCDef.SBCC_Cmds, this.btnCmd.SBCC_Cmds);
 			return tmpCmdsObj
 		},
-		systemDSFVer(){
-			if(this.systemDSFVerStr !== null && this.systemDSFVerStr !== ''){
-				return true;
-			}else{
-				return false;
-			}
-		}		
-	},
+                systemDSFVer(){
+                        if(this.systemDSFVerStr !== null && this.systemDSFVerStr !== ''){
+                                return true;
+                        }else{
+                                return false;
+                        }
+                },
+                keyboardJogEnabled(){
+                        return BtnCmdSharedSettings.getEnableKeyboardJog();
+                }
+        },
 	mixins: [
 		BtnCmdDataFunctions,
 		BtnCmdBtnActionFunctions,
@@ -1009,6 +1013,7 @@ export default {
                                         enableGC_SH_Btn: false,
                                         defaultGC_Hidden: false,
                                         enableKeyboardControl: false,
+                                        enableKeyboardJog: false,
                                         enableSBCC: false,
                                         enableAutoBackup: false,
                                         ABackupFileName: '',
@@ -1489,7 +1494,7 @@ export default {
                         if(this.capturingBinding){
                                 return false;
                         }
-                        if(!this.btnCmd.globalSettings.enableKeyboardControl){
+                        if(!this.keyboardJogEnabled){
                                 return false;
                         }
                         if(this.editMode || this.settingsMode){
@@ -2035,7 +2040,11 @@ export default {
                                 this.reloadSBCCSet = false;
                         }
                 },
-                'btnCmd.globalSettings.enableKeyboardControl'(val){
+                keyboardJogEnabled(val){
+                        if(this.btnCmd && this.btnCmd.globalSettings){
+                                this.$set(this.btnCmd.globalSettings, 'enableKeyboardControl', val);
+                                this.$set(this.btnCmd.globalSettings, 'enableKeyboardJog', val);
+                        }
                         if(!val){
                                 Object.keys(this.activeKeydowns).forEach((btnID) => {
                                         this.stopHoldJog(btnID);
