@@ -29,6 +29,39 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Keyboard Motion" v-model="passedObject.enableKeyboardJog" @change="syncKeyboardToggle"></v-switch></span>
+                                </template>
+                                <span>When enabled, configured keys can trigger BtnCmd buttons.</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-slider class="mt-4" min="10" max="600" step="5" v-model="passedObject.jogFeedrateIPM" :label="`Jog Feedrate (IPM): ${passedObject.jogFeedrateIPM}`" thumb-label></v-slider>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-text-field type="number" class="custom-label-color" label="Jog Segment Length (inches)" v-model.number="passedObject.jogSegmentInches" step="0.01"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-text-field type="number" class="custom-label-color" label="Jog Segment Scale" v-model.number="passedObject.jogSegmentScale" step="0.05"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="6">
+                            <v-text-field type="number" class="custom-label-color" label="Jog Min Segment (inches)" v-model.number="passedObject.jogMinSegmentInches" step="0.01"></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field type="number" class="custom-label-color" label="Jog Max Segment (inches)" v-model.number="passedObject.jogMaxSegmentInches" step="0.1"></v-text-field>
+                        </v-col>
+                    </v-row>
                     <v-row dense v-if="showToggButt">
                         <v-col cols="12">
                             <v-tooltip bottom>
@@ -218,6 +251,13 @@
         methods: {
             async sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
+            },
+            syncKeyboardToggle(val){
+                if(!this.passedObject){
+                    return;
+                }
+                this.$set(this.passedObject, 'enableKeyboardJog', !!val);
+                this.$set(this.passedObject, 'enableKeyboardControl', !!val);
             },
             async validateData() {
                 if(this.enableAutoBackup && this.ABackupFileName.length < 1){

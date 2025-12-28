@@ -3,6 +3,7 @@ import { DisconnectedError, OperationCancelledError } from '@/utils/errors';
 import Path from '@/utils/path';
 import deepmerge from 'deepmerge';
 import store from "@/store";
+import BtnCmdSharedSettings from "./BtnCmdSharedSettings";
 
 export default {
     methods: {
@@ -28,20 +29,27 @@ export default {
 					MQTTServer: '',
 					MQTTPort: 1883,
 					MQTTClientID: 'BtnCmd',
-					enableSelects: true,
-					lastBackupFileName: 'BtnCmdSettings',
-					pluginMinimumHeight: 0,
-					enableGC_SH_Btn: false,
-					defaultGC_Hidden: false,
-					enableSBCC: false,
-					enableAutoBackup: false,
-					ABackupFileName: '',
-					enableLaunchAtLoad: false,
-					enableChangeTopBar: false,
-					TopBarColor: '',
-					enableBounceAtLoad: false,
-					bounceAtLoadDelay: 1
-				},
+                                        enableSelects: true,
+                                        lastBackupFileName: 'BtnCmdSettings',
+                                        pluginMinimumHeight: 0,
+                                        enableGC_SH_Btn: false,
+                                        defaultGC_Hidden: false,
+                                        enableKeyboardControl: false,
+                                        enableKeyboardJog: false,
+                                        enableSBCC: false,
+                                        enableAutoBackup: false,
+                                        ABackupFileName: '',
+                                        enableLaunchAtLoad: false,
+                                        enableChangeTopBar: false,
+                                        TopBarColor: '',
+                                        enableBounceAtLoad: false,
+                                        bounceAtLoadDelay: 1,
+                                        jogFeedrateIPM: 120,
+                                        jogSegmentInches: 0.1,
+                                        jogSegmentScale: 1.0,
+                                        jogMinSegmentInches: 0.1,
+                                        jogMaxSegmentInches: 6.0
+                                },
 				SBCCSettings: {					
 					HTTP_Port: "8091",
 					API_KEY: 1234567890234,
@@ -69,12 +77,14 @@ export default {
 						btnHttpContType: 'text',
 						btnZIndex: 1,
 						btnWinHSize: 100,
-						btnWinWSize: 200,
-						btnReqConf: false,
-						btnConfText: 'Are You Sure?',
-						btnSBCCShowResult: false
-					}
-				],
+                                                btnWinWSize: 200,
+                                                btnReqConf: false,
+                                                btnConfText: 'Are You Sure?',
+                                                btnSBCCShowResult: false,
+                                                btnJogAxis: 'X',
+                                                btnJogDir: '+'
+                                        }
+                                ],
 				tabs: [
 					{
 						tabID: 1,
@@ -222,36 +232,62 @@ export default {
 			this.btnCmd.panels[tmpIdx] = panObject;
 			this.saveSettings()
 		},
-		loadSettings() {
-			var btnString = localStorage.getItem('btnCmdsettings');
-				if (btnString) {
-					this.btnCmd = JSON.parse(btnString);
-					this.onChangeTab(this.btnCmd.tabs[0].tabID);
-				} else {
-					this.resetSettings();
-			}
-		},
-		initSettings() {
-			var btnString = localStorage.getItem('btnCmdsettings');
-				if (btnString) {
-					this.btnCmd = JSON.parse(btnString);
-				} else {
-					this.resetSettings();
-			}
-		},
-		async resetSettings(){
-			
-			const awtAR = await this.autoRestore()
-		
+                loadSettings() {
+                        var btnString = localStorage.getItem('btnCmdsettings');
+                                if (btnString) {
+                                        this.btnCmd = JSON.parse(btnString);
+                                        this.ensureKeyboardSettingAlias();
+                                        this.syncSharedGlobalSettings();
+                                        this.onChangeTab(this.btnCmd.tabs[0].tabID);
+                                } else {
+                                        this.resetSettings();
+                        }
+                },
+                initSettings() {
+                        var btnString = localStorage.getItem('btnCmdsettings');
+                                if (btnString) {
+                                        this.btnCmd = JSON.parse(btnString);
+                                        this.ensureKeyboardSettingAlias();
+                                        this.syncSharedGlobalSettings();
+                                } else {
+                                        this.resetSettings();
+                        }
+                },
+                ensureKeyboardSettingAlias(){
+                        if(!this.btnCmd || !this.btnCmd.globalSettings){
+                                return;
+                        }
+                        const gs = this.btnCmd.globalSettings;
+                        if(typeof gs.enableKeyboardJog === 'undefined'){
+                                this.$set(gs, 'enableKeyboardJog', !!gs.enableKeyboardControl);
+                        }
+                        if(typeof gs.enableKeyboardControl === 'undefined'){
+                                this.$set(gs, 'enableKeyboardControl', !!gs.enableKeyboardJog);
+                        }
+                },
+                syncSharedGlobalSettings(){
+                        if(this.btnCmd && this.btnCmd.globalSettings){
+                                this.ensureKeyboardSettingAlias();
+                                BtnCmdSharedSettings.setGlobalSettingsRef(this.btnCmd.globalSettings);
+                        }else{
+                                BtnCmdSharedSettings.setGlobalSettingsRef(null);
+                        }
+                },
+                async resetSettings(){
+
+                        const awtAR = await this.autoRestore()
+
 			if(awtAR){
 				return;
 			}
-		
-			this.btnCmd = this.getRefData();
-			var defTabID = this.generateUUID('TAB');
-			var defCustTabID = this.generateUUID('TAB');
-			var defPanelID = this.generateUUID('PANEL');
-			var defBtnID = this.generateUUID('BTN');
+
+                        this.btnCmd = this.getRefData();
+                        this.ensureKeyboardSettingAlias();
+                        this.syncSharedGlobalSettings();
+                        var defTabID = this.generateUUID('TAB');
+                        var defCustTabID = this.generateUUID('TAB');
+                        var defPanelID = this.generateUUID('PANEL');
+                        var defBtnID = this.generateUUID('BTN');
 			this.btnCmd.btns[0].btnID = defBtnID;
 			this.btnCmd.btns[0].btnGroupIdx = defTabID
 			this.btnCmd.tabs[0].tabID = defTabID;
@@ -263,15 +299,17 @@ export default {
 			this.saveSettings();			
 		},
 		async autoRestore(){
-			try {
-				const setFileName = Path.combine(this.systemDirectory, 'BtnCmdAutoRestore.json');
-				const response = await store.dispatch("machine/download", { filename: setFileName, type: 'json', showSuccess: false, showError: false});
-				this.btnCmd = response;
-				this.checkDataVersion();
-				localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
-				this.onChangeTab(this.btnCmd.tabs[0].tabID);
-				this.saveSettings();
-				return true;
+                        try {
+                                const setFileName = Path.combine(this.systemDirectory, 'BtnCmdAutoRestore.json');
+                                const response = await store.dispatch("machine/download", { filename: setFileName, type: 'json', showSuccess: false, showError: false});
+                                this.btnCmd = response;
+                                this.ensureKeyboardSettingAlias();
+                                this.syncSharedGlobalSettings();
+                                this.checkDataVersion();
+                                localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
+                                this.onChangeTab(this.btnCmd.tabs[0].tabID);
+                                this.saveSettings();
+                                return true;
 			} catch (e) {
 				if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
 					console.warn(e);
@@ -301,14 +339,16 @@ export default {
 		},
 		async loadSettingsFromFile() {
 			try {
-				const setFileName = Path.combine(this.systemDirectory, `${this.btnCmd.globalSettings.lastBackupFileName}.json`);
-				const response = await store.dispatch("machine/download", { filename: setFileName, type: 'json', showSuccess: false });
-				this.btnCmd = response;
-				this.checkDataVersion();
-				localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
-			} catch (e) {
-				if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
-					console.warn(e);
+                                const setFileName = Path.combine(this.systemDirectory, `${this.btnCmd.globalSettings.lastBackupFileName}.json`);
+                                const response = await store.dispatch("machine/download", { filename: setFileName, type: 'json', showSuccess: false });
+                                this.btnCmd = response;
+                                this.ensureKeyboardSettingAlias();
+                                this.syncSharedGlobalSettings();
+                                this.checkDataVersion();
+                                localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
+                        } catch (e) {
+                                if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
+                                        console.warn(e);
 				}
 			}
 		},
@@ -414,12 +454,18 @@ export default {
 				var refData = this.getRefData();
 				var ni = null;
 				var tmpTabObj = null;
-				const merge = deepmerge;
-				//merge systemSettings
-				this.newData.systemSettings = merge(refData.systemSettings, this.btnCmd.systemSettings);
-				//merge globalSettings
-				this.newData.globalSettings = merge(refData.globalSettings, this.btnCmd.globalSettings);
-				//merge SBCCSettings
+                                const merge = deepmerge;
+                                //merge systemSettings
+                                this.newData.systemSettings = merge(refData.systemSettings, this.btnCmd.systemSettings);
+                                //merge globalSettings
+                                this.newData.globalSettings = merge(refData.globalSettings, this.btnCmd.globalSettings);
+                                if(!Object.prototype.hasOwnProperty.call(this.newData.globalSettings, 'enableKeyboardJog')){
+                                        this.newData.globalSettings.enableKeyboardJog = !!this.newData.globalSettings.enableKeyboardControl;
+                                }
+                                if(!Object.prototype.hasOwnProperty.call(this.newData.globalSettings, 'enableKeyboardControl')){
+                                        this.newData.globalSettings.enableKeyboardControl = !!this.newData.globalSettings.enableKeyboardJog;
+                                }
+                                //merge SBCCSettings
 				//as this is a new key in 0.10.6 we need to just add the default if it does not already exist
 				var tmpPropCheckObj = Object.prototype.hasOwnProperty.call(this.btnCmd, "SBCCSettings");
 				if(tmpPropCheckObj){
@@ -457,13 +503,14 @@ export default {
 					for(ni in this.btnCmd.SBCC_Cmds){
 						this.newData.SBCC_Cmds.push(merge(refData.SBCC_Cmds[0], this.btnCmd.SBCC_Cmds[ni]))
 					}
-				}else{
-					this.newData.SBCC_Cmds.push(refData.SBCC_Cmds[0]);
-				}
-				//finished upgrade update live data
-				this.btnCmd = this.newData;
-				//this check to see if the data has already been migrated from numeric id's to guid's
-				if(!this.btnCmd.btnCmdIDUpdateRun){
+                                }else{
+                                        this.newData.SBCC_Cmds.push(refData.SBCC_Cmds[0]);
+                                }
+                                //finished upgrade update live data
+                                this.btnCmd = this.newData;
+                                this.syncSharedGlobalSettings();
+                                //this check to see if the data has already been migrated from numeric id's to guid's
+                                if(!this.btnCmd.btnCmdIDUpdateRun){
 					//this is done hierarchicaly tab - btn - panel
 					ni = null;
 					//update tabs
