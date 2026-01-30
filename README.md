@@ -40,3 +40,7 @@ BtnCmd uses the following libraries/modules:
  - [axios](https://www.npmjs.com/package/axios)
  - [jasonpath](https://www.npmjs.com/package/jsonpath)  
  - [vuedraggable](https://www.npmjs.com/package/vuedraggable)
+
+## MQTT → DWC G-code bridge example
+
+If you want to translate MQTT pendant messages into DWC g-code, see the example bridge script and setup notes in [`docs/mqtt-gcode-bridge.md`](docs/mqtt-gcode-bridge.md).
