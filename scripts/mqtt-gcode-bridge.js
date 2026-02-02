@@ -11,9 +11,11 @@ const config = {
   dwcUrl: process.env.DWC_URL || "https://duet.local",
   dwcPassword: process.env.DWC_PASSWORD || "",
   dwcTlsInsecure: process.env.DWC_TLS_INSECURE === "1",
+  dwcMethod: (process.env.DWC_METHOD || "GET").toUpperCase(),
   buttonMapFile: process.env.BUTTON_MAP_FILE || "",
 };
 
+const normalizedDwcUrl = config.dwcUrl.replace(/\/+$/, "");
 const client = mqtt.connect(config.mqttUrl);
 let buttonMap = {};
 
@@ -39,11 +41,11 @@ buttonMap = loadButtonMap();
 function buildDwcEndpoint(command) {
   const encoded = encodeURIComponent(command);
   if (config.dwcPassword) {
-    return `${config.dwcUrl}/machine/code?gcode=${encoded}&password=${encodeURIComponent(
+    return `${normalizedDwcUrl}/machine/code?gcode=${encoded}&password=${encodeURIComponent(
       config.dwcPassword
     )}`;
   }
-  return `${config.dwcUrl}/machine/code?gcode=${encoded}`;
+  return `${normalizedDwcUrl}/machine/code?gcode=${encoded}`;
 }
 
 async function sendGcode(command) {
@@ -51,12 +53,17 @@ async function sendGcode(command) {
   const httpsAgent = config.dwcTlsInsecure
     ? new https.Agent({ rejectUnauthorized: false })
     : undefined;
-  await axios.post(url, null, { timeout: 5000, httpsAgent });
+  if (config.dwcMethod === "POST") {
+    await axios.post(url, null, { timeout: 5000, httpsAgent });
+  } else {
+    await axios.get(url, { timeout: 5000, httpsAgent });
+  }
   process.stdout.write(`Sent gcode: ${command}\n`);
 }
 
 client.on("connect", () => {
   process.stdout.write(`Connected to MQTT: ${config.mqttUrl}\n`);
+  process.stdout.write(`DWC target: ${normalizedDwcUrl} (${config.dwcMethod})\n`);
   client.subscribe(config.mqttTopic, (err) => {
     if (err) {
       process.stderr.write(`Failed to subscribe: ${err.message}\n`);
