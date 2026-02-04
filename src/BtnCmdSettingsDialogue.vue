@@ -42,6 +42,16 @@
                     </v-row>
                     <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="State Variable (optional)" v-model="passedObject.btnStateVarName" placeholder="global.myVar or state.status"></v-text-field>
+                                </template>
+                                <span>When set, button color will reflect the variable value (0/false or 1/true).</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense>
+                        <v-col cols="12">
                             <div class="d-flex align-center flex-wrap">
                                 <span class="mr-3">Current Binding: {{ bindingLabel }}</span>
                                 <v-btn x-small color="primary" class="mr-2" @click="startKeyCapture">Bind Key</v-btn>
@@ -168,6 +178,21 @@
                     <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
                             <div class="btnCmd-container"><v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnColour"></v-color-picker></div>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense>
+                        <v-col cols="12" class="text-caption text-center">State Colors (0/false, 1/true)</v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense>
+                        <v-col cols="6">
+                            <div class="btnCmd-container">
+                                <v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnStateZeroColor"></v-color-picker>
+                            </div>
+                        </v-col>
+                        <v-col cols="6">
+                            <div class="btnCmd-container">
+                                <v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnStateOneColor"></v-color-picker>
+                            </div>
                         </v-col>
                     </v-row>
                     <small>*indicates required field. You must provide an icon and/or label.</small>

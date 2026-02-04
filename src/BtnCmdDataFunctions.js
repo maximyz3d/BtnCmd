@@ -77,12 +77,15 @@ export default {
 						btnHttpContType: 'text',
 						btnZIndex: 1,
 						btnWinHSize: 100,
-                                                btnWinWSize: 200,
+						btnWinWSize: 200,
                                                 btnReqConf: false,
                                                 btnConfText: 'Are You Sure?',
                                                 btnSBCCShowResult: false,
                                                 btnJogAxis: 'X',
-                                                btnJogDir: '+'
+                                                btnJogDir: '+',
+                                                btnStateVarName: '',
+                                                btnStateZeroColor: '#FF0000',
+                                                btnStateOneColor: '#00FF00'
                                         }
                                 ],
 				tabs: [
@@ -565,6 +568,22 @@ export default {
 				this.btnCmd.btnCmdVersion = this.btnCmdVersion;
 				this.saveSettings();
 			}
-		}
+		},
+                getBtnDisplayColor(btn){
+                        if(!btn || !btn.btnStateVarName){
+                                return btn?.btnColour ?? '';
+                        }
+                        const rawVal = this.getModelValue(btn.btnStateVarName);
+                        if(rawVal === '###' || rawVal === null || typeof rawVal === 'undefined'){
+                                return btn.btnColour;
+                        }
+                        if(rawVal === true || rawVal === 1 || rawVal === '1' || rawVal === 'true'){
+                                return btn.btnStateOneColor || btn.btnColour;
+                        }
+                        if(rawVal === false || rawVal === 0 || rawVal === '0' || rawVal === 'false'){
+                                return btn.btnStateZeroColor || btn.btnColour;
+                        }
+                        return btn.btnColour;
+                }
     }
   };

@@ -277,7 +277,7 @@
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
-   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
+   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="getBtnDisplayColor(btn)" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																					<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																					<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																				</v-btn>
@@ -288,7 +288,7 @@
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
-   <v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
+   <v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="getBtnDisplayColor(btn)" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																					<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																					<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																				</v-btn>
@@ -298,13 +298,13 @@
 																	</div>
 																	<!--Non tooltip buttons-->
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
+   <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="getBtnDisplayColor(btn)" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
 																	</div>
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0">
-   <v-btn v-if="btn.autoSize" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
+   <v-btn v-if="btn.autoSize" :class="{'btncmd-jog-active': isJogActive(btn.btnID)}" :color="getBtnDisplayColor(btn)" :elevation="1" :disabled="chkJobEnabled(btn)" @click="btn.btnType === 'JogHold' ? null : onBtnClick($event, btn)" @pointerdown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @pointerup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointerleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @pointercancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mousedown="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @mouseup="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @mouseleave="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchstart="btn.btnType === 'JogHold' ? onJogPointerDown($event, btn) : null" @touchend="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null" @touchcancel="btn.btnType === 'JogHold' ? onJogPointerUp($event, btn) : null">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
@@ -313,7 +313,7 @@
 																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
-																				<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
+																				<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="getBtnDisplayColor(btn)" :elevation="1"  @contextmenu="doMenu($event, btn)">
 																					<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
 																				</v-btn>
 																			</template>
@@ -323,7 +323,7 @@
 																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" class="drag-handle">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
-																				<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
+																				<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="getBtnDisplayColor(btn)" :elevation="1" @contextmenu="doMenu($event, btn)">
 																					<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
 																				</v-btn>
 																			</template>
@@ -1055,12 +1055,15 @@ export default {
 						btnHttpContType: 'text',
 						btnZIndex: 1,
 						btnWinHSize: 100,
-                                                btnWinWSize: 200,
+						btnWinWSize: 200,
                                                 btnReqConf: false,
                                                 btnConfText: 'Are You Sure?',
                                                 btnSBCCShowResult: false,
                                                 btnJogAxis: 'X',
-                                                btnJogDir: '+'
+                                                btnJogDir: '+',
+                                                btnStateVarName: '',
+                                                btnStateZeroColor: '#FF0000',
+                                                btnStateOneColor: '#00FF00'
                                         }
                                 ],
 				tabs: [
