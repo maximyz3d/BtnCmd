@@ -267,6 +267,9 @@ export default {
                         if(typeof gs.enableKeyboardControl === 'undefined'){
                                 this.$set(gs, 'enableKeyboardControl', !!gs.enableKeyboardJog);
                         }
+                        //always keep top panel hide option enabled by default
+                        this.$set(gs, 'enableGC_SH_Btn', true);
+                        this.$set(gs, 'defaultGC_Hidden', true);
                 },
                 syncSharedGlobalSettings(){
                         if(this.btnCmd && this.btnCmd.globalSettings){
