@@ -1010,8 +1010,8 @@ export default {
                                         enableSelects: true,
                                         lastBackupFileName: 'BtnCmdSettings',
                                         pluginMinimumHeight: 0,
-                                        enableGC_SH_Btn: false,
-                                        defaultGC_Hidden: false,
+                                        enableGC_SH_Btn: true,
+                                        defaultGC_Hidden: true,
                                         enableKeyboardControl: false,
                                         enableKeyboardJog: false,
                                         enableSBCC: false,
@@ -1206,10 +1206,20 @@ export default {
 					return null;
 				}
 			},
+			getTopPanelEl(){
+				const byId = this.safeGetEl("global-container");
+				if(byId){
+					return byId;
+				}
+				try{
+					return window.document.querySelector('#global-container, .global-container, [id="globalContainer"]');
+				}catch{
+					return null;
+				}
+			},
 			onResize(){
 				const mainDiv = this.safeGetEl("BtnCmdMainDiv");
 				const mainTab = this.safeGetEl("BtnCmdMainTabCard");
-				const globalContainer = this.safeGetEl("global-container");
 
 				if(!mainDiv || !mainTab){
 					return;
@@ -1276,20 +1286,26 @@ export default {
 	                toggleTopPanel(bHideGCPanel){
 	                        const mainDiv = this.safeGetEl("BtnCmdMainDiv");
 	                        const mainTab = this.safeGetEl("BtnCmdMainTabCard");
-	                        const globalContainer = this.safeGetEl("global-container");
+	                        const globalContainer = this.getTopPanelEl();
 
-	                        if(!mainDiv || !mainTab || !globalContainer){
+	                        if(!mainDiv || !mainTab){
 	                                return;
 	                        }
 
 	                        if(bHideGCPanel){
-	                                const gcH = globalContainer.offsetHeight || 0;
+	                                const gcH = globalContainer ? (globalContainer.offsetHeight || 0) : 0;
 	                                mainDiv.height = window.innerHeight - 70 + gcH;
 	                                mainTab.height = window.innerHeight - 70 + gcH;
-	                                globalContainer.hidden = true;
+	                                if(globalContainer){
+	                                        globalContainer.hidden = true;
+	                                        globalContainer.style.display = 'none';
+	                                }
 	                                this.currHideTopPanel = true;
 	                        }else {
-	                                globalContainer.hidden = false;
+	                                if(globalContainer){
+	                                        globalContainer.hidden = false;
+	                                        globalContainer.style.display = '';
+	                                }
 	                                if(this.mobileActive){
 	                                        mainDiv.height = window.innerHeight;
 	                                        mainTab.height = window.innerHeight;
@@ -2131,6 +2147,20 @@ export default {
 				this.updateForDesktop();
 			}
 		},
+                'btnCmd.globalSettings.defaultGC_Hidden' (val) {
+                        if(this.mobileActive){
+                                this.toggleTopPanel(false);
+                                return;
+                        }
+                        this.toggleTopPanel(!!val);
+                },
+                'btnCmd.globalSettings.enableGC_SH_Btn' (val) {
+                        if(!val){
+                                this.toggleTopPanel(false);
+                        }else if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
+                                this.toggleTopPanel(true);
+                        }
+                },
                 reloadSBCCSet (val) {
                         //watches for reload  flag for SBCC commands if enabled
                         if(this.btnCmd.globalSettings.enableSBCC && val){
